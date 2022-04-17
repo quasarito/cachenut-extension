@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
+  Alert,
   AppBar,
   Button,
   Card,
@@ -17,9 +18,8 @@ import {
   Typography,
 } from '@mui/material';
 import { ExpandMoreOutlined } from '@mui/icons-material';
-import { Alert } from '@mui/lab';
 import * as React from 'react';
-import { browser } from 'webextension-polyfill-ts';
+import browser from 'webextension-polyfill';
 import { parseCryptoKey } from '../CacheNut/Crypto';
 import { createHttpClient, register } from '../CacheNut/HttpClient';
 import { getLocalStorage, resetAccount, saveAccount, saveCryptoKey } from '../CacheNut/Model';
@@ -130,123 +130,121 @@ export const Options: React.FC = () => {
   const [ expanded, setExpanded ] = React.useState(false);
   const handleExpandClick = (): void => { setExpanded(!expanded); };
 
-  return (
-    <>
-      <AppBar position="static">
-        <Toolbar variant="dense">
-          <Typography variant="h6" color="inherit">
-            Cache Nut Advanced Options
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <CssBaseline />
-      <Divider />
-      <Container sx={ OptionsStyles.paper }>
-        <Card variant="outlined">
-          <CardHeader
-            title="Sync account data"
-            subheader="Refresh account information for this browser."
-          />
+  return <>
+    <AppBar position="static">
+      <Toolbar variant="dense">
+        <Typography variant="h6" color="inherit">
+          Cache Nut Advanced Options
+        </Typography>
+      </Toolbar>
+    </AppBar>
+    <CssBaseline />
+    <Divider />
+    <Container sx={ OptionsStyles.paper }>
+      <Card variant="outlined">
+        <CardHeader
+          title="Sync account data"
+          subheader="Refresh account information for this browser."
+        />
+        <CardActions>
+          <Button
+            size="small"
+            variant="contained"
+            color="primary"
+            sx={ OptionsStyles.submit }
+            onClick={syncAccount}
+          >
+            Sync
+          </Button>
+        </CardActions>
+      </Card>
+      <Card variant="outlined">
+        <CardHeader
+          title="Erase account data"
+          subheader="Remove all account information from this browser."
+        />
+        <CardActions>
+          <Button
+            size="small"
+            variant="contained"
+            color="primary"
+            sx={ OptionsStyles.submit }
+            onClick={resetData}
+          >
+            Reset
+          </Button>
+        </CardActions>
+      </Card>
+      <Card variant="outlined">
+        <CardHeader
+          action={
+            <IconButton
+              onClick={handleExpandClick}
+              sx={expanded ? CacheNutStyles.expandClose : CacheNutStyles.expandOpen }
+              size="large">
+              <ExpandMoreOutlined />
+            </IconButton>
+          }
+          title="Direct Registration"
+          subheader="Add an account with known details."
+        />
+        <Collapse in={expanded} timeout="auto" unmountOnExit>
+          <CardContent sx={ OptionsStyles.card }>
+            <Alert severity="warning">
+              For advanced use only! Current account details will be lost.
+            </Alert>
+            <div>
+              <TextField
+                variant="outlined"
+                label="Account id"
+                sx={ OptionsStyles.paper }
+                required
+                inputRef={accountIdField}
+                onChange={refreshOnChange(accountIdField.current?.value.length)}
+                error={accountIdField.current?.value.trim().length === 0}
+              />
+            </div>
+            <div>
+              <TextField
+                variant="outlined"
+                label="Account key"
+                multiline
+                sx={ OptionsStyles.paper }
+                required
+                rows={3}
+                maxRows={10}
+                inputRef={accountKeyField}
+                onChange={refreshOnChange(accountKeyField.current?.value.length)}
+                error={accountKeyField.current?.value.trim().length === 0}
+              />
+            </div>
+            <div>
+              <TextField
+                variant="outlined"
+                label="Device name"
+                sx={ OptionsStyles.paper }
+                required
+                defaultValue={createDeviceName()}
+                inputRef={deviceNameField}
+                onChange={refreshOnChange(deviceNameField.current?.value.length)}
+                error={deviceNameField.current?.value.trim().length === 0}
+              />
+            </div>
+          </CardContent>
           <CardActions>
             <Button
               size="small"
               variant="contained"
               color="primary"
               sx={ OptionsStyles.submit }
-              onClick={syncAccount}
+              onClick={registerDirect}
             >
-              Sync
+              Register
             </Button>
           </CardActions>
-        </Card>
-        <Card variant="outlined">
-          <CardHeader
-            title="Erase account data"
-            subheader="Remove all account information from this browser."
-          />
-          <CardActions>
-            <Button
-              size="small"
-              variant="contained"
-              color="primary"
-              sx={ OptionsStyles.submit }
-              onClick={resetData}
-            >
-              Reset
-            </Button>
-          </CardActions>
-        </Card>
-        <Card variant="outlined">
-          <CardHeader
-            action={
-              <IconButton
-                onClick={handleExpandClick}
-                sx={expanded ? CacheNutStyles.expandClose : CacheNutStyles.expandOpen }
-              >
-                <ExpandMoreOutlined />
-              </IconButton>
-            }
-            title="Direct Registration"
-            subheader="Add an account with known details."
-          />
-          <Collapse in={expanded} timeout="auto" unmountOnExit>
-            <CardContent sx={ OptionsStyles.card }>
-              <Alert severity="warning">
-                For advanced use only! Current account details will be lost.
-              </Alert>
-              <div>
-                <TextField
-                  variant="outlined"
-                  label="Account id"
-                  sx={ OptionsStyles.paper }
-                  required
-                  inputRef={accountIdField}
-                  onChange={refreshOnChange(accountIdField.current?.value.length)}
-                  error={accountIdField.current?.value.trim().length === 0}
-                />
-              </div>
-              <div>
-                <TextField
-                  variant="outlined"
-                  label="Account key"
-                  multiline
-                  sx={ OptionsStyles.paper }
-                  required
-                  rows={3}
-                  maxRows={10}
-                  inputRef={accountKeyField}
-                  onChange={refreshOnChange(accountKeyField.current?.value.length)}
-                  error={accountKeyField.current?.value.trim().length === 0}
-                />
-              </div>
-              <div>
-                <TextField
-                  variant="outlined"
-                  label="Device name"
-                  sx={ OptionsStyles.paper }
-                  required
-                  defaultValue={createDeviceName()}
-                  inputRef={deviceNameField}
-                  onChange={refreshOnChange(deviceNameField.current?.value.length)}
-                  error={deviceNameField.current?.value.trim().length === 0}
-                />
-              </div>
-            </CardContent>
-            <CardActions>
-              <Button
-                size="small"
-                variant="contained"
-                color="primary"
-                sx={ OptionsStyles.submit }
-                onClick={registerDirect}
-              >
-                Register
-              </Button>
-            </CardActions>
-          </Collapse>
-        </Card>
-      </Container>
-      {ToastComponent(toast)}
-    </>
-  );
+        </Collapse>
+      </Card>
+    </Container>
+    {ToastComponent(toast)}
+  </>;
 };

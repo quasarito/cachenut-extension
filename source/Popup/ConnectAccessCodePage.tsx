@@ -94,62 +94,60 @@ export const ConnectAccessCodePage: React.FC<{slide?: SlideDirection;mock?: Conn
   const toast: Toast = {} as Toast;
   const controller = mock || createConnectAccessCodeController();
 
-  return (
-    <>
-      <AppBar position="static">
-        <Toolbar variant="dense">
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            onClick={(): void => navigateTo(<UnregisteredPage slide="done" />)}
-          >
-            <ArrowBackOutlined />
-          </IconButton>
-          <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
-            Connect Account
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <CssBaseline />
-      <Slide direction={slideDirection(slide)} in>
-        <Container sx={ CacheNutStyles.paper }>
-          <VpnKeyOutlined fontSize="large" />
-          Enter the access code displayed on the active device.
-          <TextField fullWidth label="Access code" inputRef={accessCodeField} />
-          <Button
-            variant="contained"
-            color="primary"
-            sx={ CacheNutStyles.submit }
-            onClick={(): void => {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const accessCodeInput = accessCodeField.current as any;
-              if (!accessCodeInput || !accessCodeInput.value.trim()) {
-                toast.error('Please provide an access code.');
-                return;
+  return <>
+    <AppBar position="static">
+      <Toolbar variant="dense">
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-label="menu"
+          onClick={(): void => navigateTo(<UnregisteredPage slide="done" />)}
+          size="large">
+          <ArrowBackOutlined />
+        </IconButton>
+        <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
+          Connect Account
+        </Typography>
+      </Toolbar>
+    </AppBar>
+    <CssBaseline />
+    <Slide direction={slideDirection(slide)} in>
+      <Container sx={ CacheNutStyles.paper }>
+        <VpnKeyOutlined fontSize="large" />
+        Enter the access code displayed on the active device.
+        <TextField fullWidth label="Access code" inputRef={accessCodeField} />
+        <Button
+          variant="contained"
+          color="primary"
+          sx={ CacheNutStyles.submit }
+          onClick={(): void => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const accessCodeInput = accessCodeField.current as any;
+            if (!accessCodeInput || !accessCodeInput.value.trim()) {
+              toast.error('Please provide an access code.');
+              return;
+            }
+            controller.connectClicked(accessCodeField.current)
+            .then((payloadHash) => {
+              if (payloadHash) {
+                navigateTo(<ConnectLinkCodePage slide="next" />);
               }
-              controller.connectClicked(accessCodeField.current)
-              .then((payloadHash) => {
-                if (payloadHash) {
-                  navigateTo(<ConnectLinkCodePage slide="next" />);
-                }
-                else {
-                  toast.error('An error occurred. Try again.');
-                }
-              })
-              .catch((error) => {
-                console.log(error.thrown || error);
-                toast.error(error.message || 'An error occurred. Try again.');
-              });
-            }}
-          >
-            Connect
-          </Button>
-        </Container>
-      </Slide>
-      {ToastComponent(toast)}
-    </>
-  );
+              else {
+                toast.error('An error occurred. Try again.');
+              }
+            })
+            .catch((error) => {
+              console.log(error.thrown || error);
+              toast.error(error.message || 'An error occurred. Try again.');
+            });
+          }}
+        >
+          Connect
+        </Button>
+      </Container>
+    </Slide>
+    {ToastComponent(toast)}
+  </>;
 };
 
 export interface ConnectAccessCodeController {

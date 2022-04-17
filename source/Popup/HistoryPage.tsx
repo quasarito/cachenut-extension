@@ -35,7 +35,7 @@ import {
   RefreshOutlined,
   TextFieldsOutlined,
 } from '@mui/icons-material';
-import { browser } from 'webextension-polyfill-ts';
+import browser from 'webextension-polyfill';
 
 import {
   CacheNutStyles,
@@ -175,7 +175,7 @@ export const HistoryPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
             <IconButton
               onClick={handleExpandClick}
               sx={expanded ? CacheNutStyles.expandClose : CacheNutStyles.expandOpen }
-            >
+              size="large">
               <ExpandMoreOutlined />
             </IconButton>
           }
@@ -284,52 +284,46 @@ export const HistoryPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
         </ImageListItem>
       );
     }
-  } else {
-    gridListItems = (
-      <ImageListItem style={{height: 'auto'}}>
-        <CircularProgress />
-      </ImageListItem>
-    );
   }
-  return (
-    <>
-      <AppBar position="static">
-        <Toolbar variant="dense">
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="Menu"
-            onClick={toggleMenuDrawer()}
-          >
-            <MenuOutlined />
-          </IconButton>
-          <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
-            Clipboard History
-          </Typography>
-          <IconButton
-            edge="end"
-            color="inherit"
-            aria-label="Refresh"
-            onClick={(): void => { setClipsLoaded(false); }}
-          >
-            <RefreshOutlined />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-      <CssBaseline />
-      <Slide direction={slideDirection(slide)} in>
-        <Container sx={ CacheNutStyles.paper }>
-          <ImageList cols={1}>{gridListItems}</ImageList>
-        </Container>
-      </Slide>
-      {ToastComponent(toast)}
-      <Drawer
-        anchor="left"
-        open={isMenuOpen}
-        onClose={(): void => openMenu(false)}
-      >
-        {menuItems()}
-      </Drawer>
-    </>
-  );
+
+  const contentBody = gridListItems ? <ImageList cols={1}>{gridListItems}</ImageList> : <CircularProgress />;
+  return <>
+    <AppBar position="static">
+      <Toolbar variant="dense">
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-label="Menu"
+          onClick={toggleMenuDrawer()}
+          size="large">
+          <MenuOutlined />
+        </IconButton>
+        <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
+          Clipboard History
+        </Typography>
+        <IconButton
+          edge="end"
+          color="inherit"
+          aria-label="Refresh"
+          onClick={(): void => { setClipsLoaded(false); }}
+          size="large">
+          <RefreshOutlined />
+        </IconButton>
+      </Toolbar>
+    </AppBar>
+    <CssBaseline />
+    <Slide direction={slideDirection(slide)} in>
+      <Container sx={ CacheNutStyles.paper }>
+        {contentBody}
+      </Container>
+    </Slide>
+    {ToastComponent(toast)}
+    <Drawer
+      anchor="left"
+      open={isMenuOpen}
+      onClose={(): void => openMenu(false)}
+    >
+      {menuItems()}
+    </Drawer>
+  </>;
 };

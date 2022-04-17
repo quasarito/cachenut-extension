@@ -12,7 +12,7 @@ import {
   Typography,
 } from '@mui/material';
 import { ArrowBackOutlined, PostAddOutlined } from '@mui/icons-material';
-import { browser } from 'webextension-polyfill-ts';
+import browser from 'webextension-polyfill';
 
 import {
   CacheNutStyles,
@@ -56,57 +56,55 @@ export const NewAccountPage: React.FC<{slide?: SlideDirection; mock?: NewAccount
   const controller = mock || createNewAccountPageController();
   const defaultName = createDeviceName();
 
-  return (
-    <>
-      <AppBar position="static">
-        <Toolbar variant="dense">
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            onClick={(): void => navigateTo(<UnregisteredPage slide="done" />)}
-          >
-            <ArrowBackOutlined />
-          </IconButton>
-          <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
-            New Account
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <CssBaseline />
-      <Slide direction={slideDirection(slide)} in>
-        <Container sx={ CacheNutStyles.paper }>
-          <PostAddOutlined fontSize="large" />
-          Create a new account for this device.
-          <TextField fullWidth label="Device name" defaultValue={defaultName} inputRef={deviceNameField} />
-          <Button
-            variant="contained"
-            color="primary"
-            sx={ CacheNutStyles.submit }
-            onClick={(): Promise<void> =>
-              controller.createAccount(deviceNameField.current)
-              .then(([account, err]) => {
-                if (account) {
-                  toast.success('Account created.').then(() => {
-                    navigateTo(<AccountPage slide="done" />);
-                  });
-                }
-                else if (err) {
-                  toast.error(err);
-                }
-              })
-              .catch(() => {
-                toast.error('Unable to save account. Try again.');
-              })
-            }
-          >
-            Register
-          </Button>
-        </Container>
-      </Slide>
-      {ToastComponent(toast)}
-    </>
-  );
+  return <>
+    <AppBar position="static">
+      <Toolbar variant="dense">
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-label="menu"
+          onClick={(): void => navigateTo(<UnregisteredPage slide="done" />)}
+          size="large">
+          <ArrowBackOutlined />
+        </IconButton>
+        <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
+          New Account
+        </Typography>
+      </Toolbar>
+    </AppBar>
+    <CssBaseline />
+    <Slide direction={slideDirection(slide)} in>
+      <Container sx={ CacheNutStyles.paper }>
+        <PostAddOutlined fontSize="large" />
+        Create a new account for this device.
+        <TextField fullWidth label="Device name" defaultValue={defaultName} inputRef={deviceNameField} />
+        <Button
+          variant="contained"
+          color="primary"
+          sx={ CacheNutStyles.submit }
+          onClick={(): Promise<void> =>
+            controller.createAccount(deviceNameField.current)
+            .then(([account, err]) => {
+              if (account) {
+                toast.success('Account created.').then(() => {
+                  navigateTo(<AccountPage slide="done" />);
+                });
+              }
+              else if (err) {
+                toast.error(err);
+              }
+            })
+            .catch(() => {
+              toast.error('Unable to save account. Try again.');
+            })
+          }
+        >
+          Register
+        </Button>
+      </Container>
+    </Slide>
+    {ToastComponent(toast)}
+  </>;
 };
 
 export interface NewAccountPageController {

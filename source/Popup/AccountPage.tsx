@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { AppBar, Button, Container, CssBaseline, IconButton, Slide, Toolbar, Typography } from '@mui/material';
 import { AccountBoxOutlined, ArrowBackOutlined, HowToRegOutlined } from '@mui/icons-material';
-import { browser } from 'webextension-polyfill-ts';
+import browser from 'webextension-polyfill';
 
 import { CacheNutStyles, navigateTo, slideDirection, SlideDirection, Toast, ToastComponent } from './PageSupport';
 import { HistoryPage } from './HistoryPage';
@@ -47,76 +47,74 @@ export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageCo
     }
   });
 
-  return (
-    <>
-      <AppBar position="static">
-        <Toolbar variant="dense">
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            onClick={(): void => navigateTo(<HistoryPage slide="back" />)}
-          >
-            <ArrowBackOutlined />
-          </IconButton>
-          <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
-            Account Info
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <CssBaseline />
-      <Slide direction={slideDirection(slide)} in>
-        <Container sx={ CacheNutStyles.paper }>
-          {account.id ? (<HowToRegOutlined fontSize="large" />) : (<AccountBoxOutlined fontSize="large" />)}
-          Account id:
-          <Typography gutterBottom>
-            {account.id ? account.id : 'No active account'}
-          </Typography>
-          Device id:
-          <Typography gutterBottom>
-            {account.id ? account.deviceId : 'No active device'}
-          </Typography>
-          <Button
-            variant="outlined"
-            color="primary"
-            sx={ CacheNutStyles.submit }
-            onClick={(): void => {
-              controller
-                .disconnect()
-                .then(async () => toast.message('Disconnected.'))
-                .then(() => navigateTo(<UnregisteredPage />))
-                .catch(async () =>
-                  toast.error('An error occurred. Try again.')
-                );
-            }}
-          >
-            Disconnect from account
-          </Button>
-          Connected:
-          <Typography gutterBottom>
-            {deviceList.length||'#'} {deviceList.length === 1 ? 'device' : 'devices'}
-          </Typography>
-          <Button
-            variant="outlined"
-            color="primary"
-            sx={ CacheNutStyles.submit }
-            onClick={(): void => navigateTo(<ManageDevicesPage slide="next" />)}
-          >
-            Manage devices
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            sx={ CacheNutStyles.submit }
-            onClick={addNewDeviceClicked}
-          >
-            Add a new device
-          </Button>
-        </Container>
-      </Slide>
-      {ToastComponent(toast)}
-    </>
-  );
+  return <>
+    <AppBar position="static">
+      <Toolbar variant="dense">
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-label="menu"
+          onClick={(): void => navigateTo(<HistoryPage slide="back" />)}
+          size="large">
+          <ArrowBackOutlined />
+        </IconButton>
+        <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
+          Account Info
+        </Typography>
+      </Toolbar>
+    </AppBar>
+    <CssBaseline />
+    <Slide direction={slideDirection(slide)} in>
+      <Container sx={ CacheNutStyles.paper }>
+        {account.id ? (<HowToRegOutlined fontSize="large" />) : (<AccountBoxOutlined fontSize="large" />)}
+        Account id:
+        <Typography gutterBottom>
+          {account.id ? account.id : 'No active account'}
+        </Typography>
+        Device id:
+        <Typography gutterBottom>
+          {account.id ? account.deviceId : 'No active device'}
+        </Typography>
+        <Button
+          variant="outlined"
+          color="primary"
+          sx={ CacheNutStyles.submit }
+          onClick={(): void => {
+            controller
+              .disconnect()
+              .then(async () => toast.message('Disconnected.'))
+              .then(() => navigateTo(<UnregisteredPage />))
+              .catch(async () =>
+                toast.error('An error occurred. Try again.')
+              );
+          }}
+        >
+          Disconnect from account
+        </Button>
+        Connected:
+        <Typography gutterBottom>
+          {deviceList.length||'#'} {deviceList.length === 1 ? 'device' : 'devices'}
+        </Typography>
+        <Button
+          variant="outlined"
+          color="primary"
+          sx={ CacheNutStyles.submit }
+          onClick={(): void => navigateTo(<ManageDevicesPage slide="next" />)}
+        >
+          Manage devices
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          sx={ CacheNutStyles.submit }
+          onClick={addNewDeviceClicked}
+        >
+          Add a new device
+        </Button>
+      </Container>
+    </Slide>
+    {ToastComponent(toast)}
+  </>;
 };
 
 export interface AccountPageController {

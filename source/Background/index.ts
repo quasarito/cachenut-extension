@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import UAParser from 'ua-parser-js';
-import { browser, Menus } from 'webextension-polyfill-ts';
+import browser, { Menus } from 'webextension-polyfill';
 
 import { createHttpClient } from '../CacheNut/HttpClient';
 import { ClipboardContent, loadAccount } from '../CacheNut/Model';

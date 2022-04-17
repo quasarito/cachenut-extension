@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import {
+  Alert,
   AppBar,
   Button,
   CircularProgress,
@@ -12,7 +13,6 @@ import {
   Typography
 } from '@mui/material';
 import { ArrowBackOutlined, RefreshOutlined, VpnKeyOutlined } from '@mui/icons-material';
-import { Alert } from '@mui/lab';
 
 import {
   CacheNutStyles,
@@ -131,37 +131,35 @@ export const AddDeviceAccessCodePage: React.FC<{slide?: SlideDirection; mock?: A
     );
   }
 
-  return (
-    <>
-      <AppBar position="static">
-        <Toolbar variant="dense">
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            onClick={(): void => navigateTo(<AccountPage />)}
-          >
-            <ArrowBackOutlined />
-          </IconButton>
-          <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
-            Access Code
-          </Typography>
-          <CancelActivationButton
-            message="Cancel adding device?"
-            toast={toast}
-          />
-        </Toolbar>
-      </AppBar>
-      <CssBaseline />
-      <Slide direction={slideDirection(slide)} in>
-        <Container sx={ CacheNutStyles.paper }>
-          <VpnKeyOutlined fontSize="large" />
-          {accessCodeBody}
-        </Container>
-      </Slide>
-      {ToastComponent(toast)}
-    </>
-  );
+  return <>
+    <AppBar position="static">
+      <Toolbar variant="dense">
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-label="menu"
+          onClick={(): void => navigateTo(<AccountPage />)}
+          size="large">
+          <ArrowBackOutlined />
+        </IconButton>
+        <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
+          Access Code
+        </Typography>
+        <CancelActivationButton
+          message="Cancel adding device?"
+          toast={toast}
+        />
+      </Toolbar>
+    </AppBar>
+    <CssBaseline />
+    <Slide direction={slideDirection(slide)} in>
+      <Container sx={ CacheNutStyles.paper }>
+        <VpnKeyOutlined fontSize="large" />
+        {accessCodeBody}
+      </Container>
+    </Slide>
+    {ToastComponent(toast)}
+  </>;
 };
 
 export interface AddDeviceAccessCodeController {

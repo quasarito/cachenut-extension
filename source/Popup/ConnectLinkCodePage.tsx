@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import {
+  Alert,
   AppBar,
   Button,
   Container,
@@ -10,7 +11,6 @@ import {
   Typography,
 } from '@mui/material';
 import { LinkOutlined } from '@mui/icons-material';
-import { Alert } from '@mui/lab';
 
 import {
   CacheNutStyles,

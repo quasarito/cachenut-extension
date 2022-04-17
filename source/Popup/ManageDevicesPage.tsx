@@ -137,7 +137,7 @@ export const ManageDevicesPage: React.FC<{slide?: SlideDirection}> = ({slide}) =
                 }
               });
             }}
-          >
+            size="large">
             <DeleteOutlined />
           </IconButton>
         </Tooltip>
@@ -145,51 +145,49 @@ export const ManageDevicesPage: React.FC<{slide?: SlideDirection}> = ({slide}) =
     </ListItem>
   ));
 
-  return (
-    <>
-      <AppBar position="static">
-        <Toolbar variant="dense">
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            onClick={(): void => navigateTo(<AccountPage slide="back" />)}
-          >
-            <ArrowBackOutlined />
-          </IconButton>
-          <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
-            Manage Devices
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <CssBaseline />
-      <Slide direction={slideDirection(slide)} in>
-        <Container sx={ CacheNutStyles.paper }>
-          <Typography variant="subtitle1">
-            Trusted device <VerifiedUserOutlined />: enable only for devices that are not shared with other people.
-            These devices will have additional options enabled.
-          </Typography>
-          <div>
-            {deviceList.length > 0 ? (
-              <List>
-                <ListItem key="heading">
-                  <ListItemIcon>
-                    <Tooltip title="Trusted device">
-                      <VerifiedUserOutlined />
-                    </Tooltip>
-                  </ListItemIcon>
-                  <ListItemText primary="Device" />
-                </ListItem>
-                <Divider />
-                {deviceListItems}
-              </List>
-            ) : (
-              <CircularProgress />
-            )}
-          </div>
-        </Container>
-      </Slide>
-      {ToastComponent(toast)}
-    </>
-  );
+  return <>
+    <AppBar position="static">
+      <Toolbar variant="dense">
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-label="menu"
+          onClick={(): void => navigateTo(<AccountPage slide="back" />)}
+          size="large">
+          <ArrowBackOutlined />
+        </IconButton>
+        <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
+          Manage Devices
+        </Typography>
+      </Toolbar>
+    </AppBar>
+    <CssBaseline />
+    <Slide direction={slideDirection(slide)} in>
+      <Container sx={ CacheNutStyles.paper }>
+        <Typography variant="subtitle1">
+          Trusted device <VerifiedUserOutlined />: enable only for devices that are not shared with other people.
+          These devices will have additional options enabled.
+        </Typography>
+        <div>
+          {deviceList.length > 0 ? (
+            <List>
+              <ListItem key="heading">
+                <ListItemIcon>
+                  <Tooltip title="Trusted device">
+                    <VerifiedUserOutlined />
+                  </Tooltip>
+                </ListItemIcon>
+                <ListItemText primary="Device" />
+              </ListItem>
+              <Divider />
+              {deviceListItems}
+            </List>
+          ) : (
+            <CircularProgress />
+          )}
+        </div>
+      </Container>
+    </Slide>
+    {ToastComponent(toast)}
+  </>;
 };

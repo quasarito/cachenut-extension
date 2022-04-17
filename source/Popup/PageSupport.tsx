@@ -1,6 +1,6 @@
 import {
+  Alert,
   Button,
-  createMuiTheme,
   Grow,
   IconButton,
   Slide,
@@ -9,9 +9,10 @@ import {
   SnackbarContent,
   SxProps,
   ThemeProvider,
+  StyledEngineProvider,
 } from '@mui/material';
+import { createTheme } from '@mui/material/styles';
 import { Close } from '@mui/icons-material';
-import { Alert } from '@mui/lab';
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import UAParser from 'ua-parser-js';
@@ -21,7 +22,7 @@ import { Logger } from '../CacheNut/Support';
 
 const logger = Logger('PageSupport');
 
-const cacheNutTheme = createMuiTheme({
+const cacheNutTheme = createTheme({
   palette: {
     secondary: {
       light: 'rgba(190, 218, 37, 1)', // BEDA25
@@ -92,15 +93,19 @@ export const navigateTo = (
     document.getElementById('root');
   if (Transition) {
     ReactDOM.render(
-      <ThemeProvider theme={cacheNutTheme}>
-        <Transition>{page}</Transition>
-      </ThemeProvider>,
+      <StyledEngineProvider injectFirst>
+        <ThemeProvider theme={cacheNutTheme}>
+          <Transition>{page}</Transition>
+        </ThemeProvider>
+      </StyledEngineProvider>,
       rootElement
     );
   }
   else {
     ReactDOM.render(
-      <ThemeProvider theme={cacheNutTheme}>{page}</ThemeProvider>,
+      <StyledEngineProvider injectFirst>
+        <ThemeProvider theme={cacheNutTheme}>{page}</ThemeProvider>
+      </StyledEngineProvider>,
       rootElement
     );
   }
@@ -270,9 +275,8 @@ export const ToastComponent = (
       setToastState({
         message,
         open: true,
-        transition: (props: SlideProps) => (
-          <Slide {...props} direction="up" />
-        ),
+        // eslint-disable-next-line react/display-name
+        transition: (props: SlideProps) => (<Slide {...props} direction="up" />),
       });
       setExitCallbacks(exitCallbacks.concat(() => resolve('')));
       exitCallbacks.push(() => resolve(''));

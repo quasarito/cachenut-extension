@@ -71,65 +71,63 @@ export const ConnectDeviceNamePage: React.FC<{slide?: SlideDirection;mock?: Conn
   const defaultName = createDeviceName();
   const controller = mock || createConnectDeviceNameController();
 
-  return (
-    <>
-      <AppBar position="static">
-        <Toolbar variant="dense">
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            onClick={(): void =>navigateTo(<ConnectLinkCodePage slide="back" />)}
-          >
-            <ArrowBackOutlined />
-          </IconButton>
-          <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
-            Finish
-          </Typography>
-          <CancelActivationButton message="Quit account connection?" toast={toast}
-          />
-        </Toolbar>
-      </AppBar>
-      <CssBaseline />
-      <Slide direction={slideDirection(slide)} in>
-        <Container sx={ CacheNutStyles.paper }>
-          <DoneOutlineOutlined fontSize="large" />
-          Almost done.
-          <TextField
-            fullWidth
-            label="Name to identify this device"
-            defaultValue={defaultName}
-            inputRef={deviceNameField}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            sx={ CacheNutStyles.submit }
-            onClick={(): void => {
-              controller.registerAsDevice(deviceNameField.current)
-              .then(([account, err]) => {
-                if (account) {
-                  resetActivationData();
-                  toast.success('Connected.').then(() => {
-                    navigateTo(<AccountPage />);
-                  });
-                }
-                else if (err) {
-                  toast.error(err);
-                }
-              })
-              .catch((err) => {
-                toast.error(err.message || 'An error occurred. Try again.');
-              });
-            }}
-          >
-            Done
-          </Button>
-        </Container>
-      </Slide>
-      {ToastComponent(toast)}
-    </>
-  );
+  return <>
+    <AppBar position="static">
+      <Toolbar variant="dense">
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-label="menu"
+          onClick={(): void =>navigateTo(<ConnectLinkCodePage slide="back" />)}
+          size="large">
+          <ArrowBackOutlined />
+        </IconButton>
+        <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
+          Finish
+        </Typography>
+        <CancelActivationButton message="Quit account connection?" toast={toast}
+        />
+      </Toolbar>
+    </AppBar>
+    <CssBaseline />
+    <Slide direction={slideDirection(slide)} in>
+      <Container sx={ CacheNutStyles.paper }>
+        <DoneOutlineOutlined fontSize="large" />
+        Almost done.
+        <TextField
+          fullWidth
+          label="Name to identify this device"
+          defaultValue={defaultName}
+          inputRef={deviceNameField}
+        />
+        <Button
+          variant="contained"
+          color="primary"
+          sx={ CacheNutStyles.submit }
+          onClick={(): void => {
+            controller.registerAsDevice(deviceNameField.current)
+            .then(([account, err]) => {
+              if (account) {
+                resetActivationData();
+                toast.success('Connected.').then(() => {
+                  navigateTo(<AccountPage />);
+                });
+              }
+              else if (err) {
+                toast.error(err);
+              }
+            })
+            .catch((err) => {
+              toast.error(err.message || 'An error occurred. Try again.');
+            });
+          }}
+        >
+          Done
+        </Button>
+      </Container>
+    </Slide>
+    {ToastComponent(toast)}
+  </>;
 };
 
 export interface ConnectDeviceNameController {
