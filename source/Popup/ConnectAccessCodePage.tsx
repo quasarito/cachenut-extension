@@ -10,11 +10,11 @@ import {
   TextField,
   Toolbar,
   Typography,
-} from '@material-ui/core';
-import { ArrowBackOutlined, VpnKeyOutlined } from '@material-ui/icons';
+} from '@mui/material';
+import { ArrowBackOutlined, VpnKeyOutlined } from '@mui/icons-material';
 
 import {
-  cacheNutStyles,
+  CacheNutStyles,
   navigateTo,
   PageError,
   slideDirection,
@@ -90,7 +90,6 @@ function createConnectAccessCodeController(): ConnectAccessCodeController {
 export const ConnectAccessCodePage: React.FC<{slide?: SlideDirection;mock?: ConnectAccessCodeController;}> =
   ({mock, slide}) =>
 {
-  const classes = cacheNutStyles();
   const accessCodeField = React.useRef();
   const toast: Toast = {} as Toast;
   const controller = mock || createConnectAccessCodeController();
@@ -107,21 +106,21 @@ export const ConnectAccessCodePage: React.FC<{slide?: SlideDirection;mock?: Conn
           >
             <ArrowBackOutlined />
           </IconButton>
-          <Typography variant="h6" color="inherit" className={classes.title}>
+          <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
             Connect Account
           </Typography>
         </Toolbar>
       </AppBar>
       <CssBaseline />
       <Slide direction={slideDirection(slide)} in>
-        <Container className={classes.paper}>
+        <Container sx={ CacheNutStyles.paper }>
           <VpnKeyOutlined fontSize="large" />
           Enter the access code displayed on the active device.
           <TextField fullWidth label="Access code" inputRef={accessCodeField} />
           <Button
             variant="contained"
             color="primary"
-            className={classes.submit}
+            sx={ CacheNutStyles.submit }
             onClick={(): void => {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const accessCodeInput = accessCodeField.current as any;

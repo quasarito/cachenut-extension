@@ -10,12 +10,12 @@ import {
   Slide,
   Toolbar,
   Typography
-} from '@material-ui/core';
-import { ArrowBackOutlined, RefreshOutlined, VpnKeyOutlined } from '@material-ui/icons';
-import { Alert } from '@material-ui/lab';
+} from '@mui/material';
+import { ArrowBackOutlined, RefreshOutlined, VpnKeyOutlined } from '@mui/icons-material';
+import { Alert } from '@mui/lab';
 
 import {
-  cacheNutStyles,
+  CacheNutStyles,
   CancelActivationButton,
   formatCode,
   navigateTo,
@@ -62,7 +62,6 @@ function createAddDeviceAccessCodeController(): AddDeviceAccessCodeController {
 export const AddDeviceAccessCodePage: React.FC<{slide?: SlideDirection; mock?: AddDeviceAccessCodeController;}> =
   ({ mock, slide }) =>
 {
-  const classes = cacheNutStyles();
   const [accessCode, setAccessCode] = React.useState('');
   const controller = mock || createAddDeviceAccessCodeController();
   const toast: Toast = {} as Toast;
@@ -97,14 +96,14 @@ export const AddDeviceAccessCodePage: React.FC<{slide?: SlideDirection; mock?: A
         <Button
           variant="contained"
           color="primary"
-          className={classes.submit}
+          sx={ CacheNutStyles.submit }
           onClick={(): void => navigateTo(<AddDeviceLinkCodePage slide="next" />)}
         >
           Next
         </Button>
         <Button
           variant="outlined"
-          className={classes.submit}
+          sx={ CacheNutStyles.submit }
           size="small"
           startIcon={<RefreshOutlined />}
           aria-label="Get new code"
@@ -123,7 +122,7 @@ export const AddDeviceAccessCodePage: React.FC<{slide?: SlideDirection; mock?: A
         <Button
           variant="contained"
           color="primary"
-          className={classes.submit}
+          sx={ CacheNutStyles.submit }
           onClick={(): void => setAccessCode('')}
         >
           Try again
@@ -144,7 +143,7 @@ export const AddDeviceAccessCodePage: React.FC<{slide?: SlideDirection; mock?: A
           >
             <ArrowBackOutlined />
           </IconButton>
-          <Typography variant="h6" color="inherit" className={classes.title}>
+          <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
             Access Code
           </Typography>
           <CancelActivationButton
@@ -155,7 +154,7 @@ export const AddDeviceAccessCodePage: React.FC<{slide?: SlideDirection; mock?: A
       </AppBar>
       <CssBaseline />
       <Slide direction={slideDirection(slide)} in>
-        <Container className={classes.paper}>
+        <Container sx={ CacheNutStyles.paper }>
           <VpnKeyOutlined fontSize="large" />
           {accessCodeBody}
         </Container>

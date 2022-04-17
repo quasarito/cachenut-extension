@@ -9,11 +9,11 @@ import {
   Slide,
   Toolbar,
   Typography,
-} from '@material-ui/core';
-import {ArrowBackOutlined, DoneOutlineOutlined} from '@material-ui/icons';
+} from '@mui/material';
+import {ArrowBackOutlined, DoneOutlineOutlined} from '@mui/icons-material';
 
 import {
-  cacheNutStyles,
+  CacheNutStyles,
   navigateTo,
   slideDirection,
   SlideDirection,
@@ -23,8 +23,6 @@ import { resetActivationData } from '../CacheNut/Model';
 import { AddDeviceLinkCodePage } from './AddDeviceLinkCodePage';
 
 export const AddDeviceCompletedPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
-  const classes = cacheNutStyles();
-
   return (
     <>
       <AppBar position="static">
@@ -37,20 +35,20 @@ export const AddDeviceCompletedPage: React.FC<{slide?: SlideDirection}> = ({slid
           >
             <ArrowBackOutlined />
           </IconButton>
-          <Typography variant="h6" color="inherit" className={classes.title}>
+          <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
             Finish
           </Typography>
         </Toolbar>
       </AppBar>
       <CssBaseline />
       <Slide direction={slideDirection(slide)} in>
-        <Container className={classes.paper}>
+        <Container sx={ CacheNutStyles.paper }>
           <DoneOutlineOutlined fontSize="large" />
           Please complete the steps on the new device.
           <Button
             variant="contained"
             color="primary"
-            className={classes.submit}
+            sx={ CacheNutStyles.submit }
             onClick={(): void => {
               resetActivationData()
               .then(() => { navigateTo(<AccountPage />); })

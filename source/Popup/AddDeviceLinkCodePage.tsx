@@ -1,10 +1,10 @@
 import * as React from 'react';
 
-import { AppBar, Button, Container, CssBaseline, Slide, TextField, Toolbar, Typography } from '@material-ui/core';
-import { LinkOutlined } from '@material-ui/icons';
+import { AppBar, Button, Container, CssBaseline, Slide, TextField, Toolbar, Typography } from '@mui/material';
+import { LinkOutlined } from '@mui/icons-material';
 
 import {
-  cacheNutStyles,
+  CacheNutStyles,
   CancelActivationButton,
   formatCode,
   linkCodeFromPayloadHash,
@@ -114,7 +114,6 @@ function createAddDeviceLinkCodeController(): AddDeviceLinkCodeController {
 export const AddDeviceLinkCodePage: React.FC<{slide?: SlideDirection; mock?: AddDeviceLinkCodeController;}> =
   ({mock, slide}) =>
 {
-  const classes = cacheNutStyles();
   const linkCodeField = React.useRef();
   const [linkCode, setLinkCode] = React.useState('');
   const controller = mock || createAddDeviceLinkCodeController();
@@ -134,7 +133,7 @@ export const AddDeviceLinkCodePage: React.FC<{slide?: SlideDirection; mock?: Add
     <>
       <AppBar position="static">
         <Toolbar variant="dense">
-          <Typography variant="h6" color="inherit" className={classes.title}>
+          <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
             Add Device
           </Typography>
           <CancelActivationButton message="Quit adding device?" toast={toast} />
@@ -142,14 +141,14 @@ export const AddDeviceLinkCodePage: React.FC<{slide?: SlideDirection; mock?: Add
       </AppBar>
       <CssBaseline />
       <Slide direction={slideDirection(slide)} in>
-        <Container className={classes.paper}>
+        <Container sx={ CacheNutStyles.paper }>
           <LinkOutlined fontSize="large" />
           Complete the link code displayed by the new device.
           <TextField fullWidth label="Link code" inputRef={linkCodeField} />
           <Button
             variant="contained"
             color="primary"
-            className={classes.submit}
+            sx={ CacheNutStyles.submit }
             onClick={(): void => {
               controller.validateLinkCode(linkCodeField.current)
               .then((validated) => {

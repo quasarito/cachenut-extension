@@ -10,11 +10,11 @@ import {
   TextField,
   Toolbar,
   Typography,
-} from '@material-ui/core';
-import { ArrowBackOutlined, DoneOutlineOutlined } from '@material-ui/icons';
+} from '@mui/material';
+import { ArrowBackOutlined, DoneOutlineOutlined } from '@mui/icons-material';
 
 import {
-  cacheNutStyles,
+  CacheNutStyles,
   CancelActivationButton,
   createDeviceName,
   navigateTo,
@@ -66,7 +66,6 @@ function createConnectDeviceNameController(): ConnectDeviceNameController {
 export const ConnectDeviceNamePage: React.FC<{slide?: SlideDirection;mock?: ConnectDeviceNameController;}> =
   ({mock, slide}) =>
 {
-  const classes = cacheNutStyles();
   const deviceNameField = React.useRef();
   const toast: Toast = {} as Toast;
   const defaultName = createDeviceName();
@@ -84,7 +83,7 @@ export const ConnectDeviceNamePage: React.FC<{slide?: SlideDirection;mock?: Conn
           >
             <ArrowBackOutlined />
           </IconButton>
-          <Typography variant="h6" color="inherit" className={classes.title}>
+          <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
             Finish
           </Typography>
           <CancelActivationButton message="Quit account connection?" toast={toast}
@@ -93,7 +92,7 @@ export const ConnectDeviceNamePage: React.FC<{slide?: SlideDirection;mock?: Conn
       </AppBar>
       <CssBaseline />
       <Slide direction={slideDirection(slide)} in>
-        <Container className={classes.paper}>
+        <Container sx={ CacheNutStyles.paper }>
           <DoneOutlineOutlined fontSize="large" />
           Almost done.
           <TextField
@@ -105,7 +104,7 @@ export const ConnectDeviceNamePage: React.FC<{slide?: SlideDirection;mock?: Conn
           <Button
             variant="contained"
             color="primary"
-            className={classes.submit}
+            sx={ CacheNutStyles.submit }
             onClick={(): void => {
               controller.registerAsDevice(deviceNameField.current)
               .then(([account, err]) => {

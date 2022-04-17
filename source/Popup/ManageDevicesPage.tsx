@@ -17,10 +17,10 @@ import {
   Toolbar,
   Tooltip,
   Typography,
-} from '@material-ui/core';
-import { ArrowBackOutlined, DeleteOutlined, VerifiedUserOutlined } from '@material-ui/icons';
+} from '@mui/material';
+import { ArrowBackOutlined, DeleteOutlined, VerifiedUserOutlined } from '@mui/icons-material';
 
-import { cacheNutStyles, navigateTo, slideDirection, SlideDirection, Toast, ToastComponent } from './PageSupport';
+import { CacheNutStyles, navigateTo, slideDirection, SlideDirection, Toast, ToastComponent } from './PageSupport';
 import { Logger } from '../CacheNut/Support';
 import { AccountPage } from './AccountPage';
 import { CacheNutAccount, Device, loadAccount } from '../CacheNut/Model';
@@ -29,7 +29,6 @@ import { createHttpClient } from '../CacheNut/HttpClient';
 const logger = Logger('ManageDevicesPage:');
 
 export const ManageDevicesPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
-  const classes = cacheNutStyles();
   const [ account, setAccount ] = React.useState({} as CacheNutAccount);
   const [ deviceList, setDeviceList ] = React.useState([] as Device[]);
   const toast: Toast = {} as Toast;
@@ -158,14 +157,14 @@ export const ManageDevicesPage: React.FC<{slide?: SlideDirection}> = ({slide}) =
           >
             <ArrowBackOutlined />
           </IconButton>
-          <Typography variant="h6" color="inherit" className={classes.title}>
+          <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
             Manage Devices
           </Typography>
         </Toolbar>
       </AppBar>
       <CssBaseline />
       <Slide direction={slideDirection(slide)} in>
-        <Container className={classes.paper}>
+        <Container sx={ CacheNutStyles.paper }>
           <Typography variant="subtitle1">
             Trusted device <VerifiedUserOutlined />: enable only for devices that are not shared with other people.
             These devices will have additional options enabled.

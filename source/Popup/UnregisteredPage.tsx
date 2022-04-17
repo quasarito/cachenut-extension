@@ -1,15 +1,13 @@
 import * as React from 'react';
 
-import { AppBar, Button, Container, CssBaseline, IconButton, Slide, Toolbar, Typography } from '@material-ui/core';
-import { AccountBox, AccountBoxOutlined } from '@material-ui/icons';
+import { AppBar, Button, Container, CssBaseline, IconButton, Slide, Toolbar, Typography } from '@mui/material';
+import { AccountBox, AccountBoxOutlined } from '@mui/icons-material';
 
-import { cacheNutStyles, navigateTo, slideDirection, SlideDirection } from './PageSupport';
+import { CacheNutStyles, navigateTo, slideDirection, SlideDirection } from './PageSupport';
 import { NewAccountPage } from './NewAccountPage';
 import { ConnectAccessCodePage } from './ConnectAccessCodePage';
 
 export const UnregisteredPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
-  const classes = cacheNutStyles();
-
   return (
     <>
       <AppBar position="static">
@@ -17,19 +15,19 @@ export const UnregisteredPage: React.FC<{slide?: SlideDirection}> = ({slide}) =>
           <IconButton edge="start" color="inherit" aria-label="menu">
             <AccountBox />
           </IconButton>
-          <Typography variant="h6" color="inherit" className={classes.title}>
+          <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
             Cache Nut Account
           </Typography>
         </Toolbar>
       </AppBar>
       <CssBaseline />
       <Slide direction={slideDirection(slide)} in>
-        <Container className={classes.paper}>
+        <Container sx={ CacheNutStyles.paper }>
           <AccountBoxOutlined fontSize="large" />
           <Button
             variant="contained"
             color="primary"
-            className={classes.submit}
+            sx={ CacheNutStyles.submit }
             onClick={(): void => navigateTo(<NewAccountPage />)}
           >
             Create a new account
@@ -37,7 +35,7 @@ export const UnregisteredPage: React.FC<{slide?: SlideDirection}> = ({slide}) =>
           <Button
             variant="contained"
             color="primary"
-            className={classes.submit}
+            sx={ CacheNutStyles.submit }
             onClick={(): void => navigateTo(<ConnectAccessCodePage />)}
           >
             Connect to an account

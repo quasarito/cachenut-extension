@@ -10,12 +10,12 @@ import {
   TextField,
   Toolbar,
   Typography,
-} from '@material-ui/core';
-import { ArrowBackOutlined, PostAddOutlined } from '@material-ui/icons';
+} from '@mui/material';
+import { ArrowBackOutlined, PostAddOutlined } from '@mui/icons-material';
 import { browser } from 'webextension-polyfill-ts';
 
 import {
-  cacheNutStyles,
+  CacheNutStyles,
   createDeviceName,
   navigateTo,
   slideDirection,
@@ -51,7 +51,6 @@ function createNewAccountPageController(): NewAccountPageController {
 }
 
 export const NewAccountPage: React.FC<{slide?: SlideDirection; mock?: NewAccountPageController;}> = ({mock, slide}) => {
-  const classes = cacheNutStyles();
   const deviceNameField = React.useRef();
   const toast: Toast = {} as Toast;
   const controller = mock || createNewAccountPageController();
@@ -69,21 +68,21 @@ export const NewAccountPage: React.FC<{slide?: SlideDirection; mock?: NewAccount
           >
             <ArrowBackOutlined />
           </IconButton>
-          <Typography variant="h6" color="inherit" className={classes.title}>
+          <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
             New Account
           </Typography>
         </Toolbar>
       </AppBar>
       <CssBaseline />
       <Slide direction={slideDirection(slide)} in>
-        <Container className={classes.paper}>
+        <Container sx={ CacheNutStyles.paper }>
           <PostAddOutlined fontSize="large" />
           Create a new account for this device.
           <TextField fullWidth label="Device name" defaultValue={defaultName} inputRef={deviceNameField} />
           <Button
             variant="contained"
             color="primary"
-            className={classes.submit}
+            sx={ CacheNutStyles.submit }
             onClick={(): Promise<void> =>
               controller.createAccount(deviceNameField.current)
               .then(([account, err]) => {

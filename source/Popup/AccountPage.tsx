@@ -1,10 +1,10 @@
 import * as React from 'react';
 
-import { AppBar, Button, Container, CssBaseline, IconButton, Slide, Toolbar, Typography } from '@material-ui/core';
-import { AccountBoxOutlined, ArrowBackOutlined, HowToRegOutlined } from '@material-ui/icons';
+import { AppBar, Button, Container, CssBaseline, IconButton, Slide, Toolbar, Typography } from '@mui/material';
+import { AccountBoxOutlined, ArrowBackOutlined, HowToRegOutlined } from '@mui/icons-material';
 import { browser } from 'webextension-polyfill-ts';
 
-import { cacheNutStyles, navigateTo, slideDirection, SlideDirection, Toast, ToastComponent } from './PageSupport';
+import { CacheNutStyles, navigateTo, slideDirection, SlideDirection, Toast, ToastComponent } from './PageSupport';
 import { HistoryPage } from './HistoryPage';
 import { UnregisteredPage } from './UnregisteredPage';
 import { resetAccount, loadAccount, Device, CacheNutAccount } from '../CacheNut/Model';
@@ -27,7 +27,6 @@ function addNewDeviceClicked(): void {
 }
 
 export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageController;}> = ({mock, slide}) => {
-  const classes = cacheNutStyles();
   const [ account, setAccount ] = React.useState({} as CacheNutAccount);
   const [ deviceList, setDeviceList ] = React.useState([] as Device[]);
   const toast: Toast = {} as Toast;
@@ -60,14 +59,14 @@ export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageCo
           >
             <ArrowBackOutlined />
           </IconButton>
-          <Typography variant="h6" color="inherit" className={classes.title}>
+          <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
             Account Info
           </Typography>
         </Toolbar>
       </AppBar>
       <CssBaseline />
       <Slide direction={slideDirection(slide)} in>
-        <Container className={classes.paper}>
+        <Container sx={ CacheNutStyles.paper }>
           {account.id ? (<HowToRegOutlined fontSize="large" />) : (<AccountBoxOutlined fontSize="large" />)}
           Account id:
           <Typography gutterBottom>
@@ -80,7 +79,7 @@ export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageCo
           <Button
             variant="outlined"
             color="primary"
-            className={classes.submit}
+            sx={ CacheNutStyles.submit }
             onClick={(): void => {
               controller
                 .disconnect()
@@ -100,7 +99,7 @@ export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageCo
           <Button
             variant="outlined"
             color="primary"
-            className={classes.submit}
+            sx={ CacheNutStyles.submit }
             onClick={(): void => navigateTo(<ManageDevicesPage slide="next" />)}
           >
             Manage devices
@@ -108,7 +107,7 @@ export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageCo
           <Button
             variant="contained"
             color="primary"
-            className={classes.submit}
+            sx={ CacheNutStyles.submit }
             onClick={addNewDeviceClicked}
           >
             Add a new device

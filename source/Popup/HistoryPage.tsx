@@ -11,23 +11,20 @@ import {
   CircularProgress,
   Collapse,
   Container,
-  createStyles,
   CssBaseline,
   Divider,
   Drawer,
-  GridList,
-  GridListTile,
+  ImageList,
+  ImageListItem,
   IconButton,
   List,
   ListItem,
   ListItemText,
-  makeStyles,
   Slide,
-  Theme,
   Toolbar,
   Tooltip,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
 import {
   ExpandMoreOutlined,
   FileCopyOutlined,
@@ -37,11 +34,11 @@ import {
   OpenInNewOutlined,
   RefreshOutlined,
   TextFieldsOutlined,
-} from '@material-ui/icons';
+} from '@mui/icons-material';
 import { browser } from 'webextension-polyfill-ts';
 
 import {
-  cacheNutStyles,
+  CacheNutStyles,
   navigateTo,
   slideDirection,
   SlideDirection,
@@ -85,26 +82,7 @@ async function loadClipboardItems(): Promise<ClipboardItem[]> {
   return createHttpClient().then(async (client) => client.list());
 }
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    expand: {
-      transform: 'rotate(0deg)',
-      marginLeft: 'auto',
-      transition: theme.transitions.create('transform', {
-        duration: theme.transitions.duration.shortest,
-      }),
-    },
-    expandOpen: {
-      transform: 'rotate(180deg)',
-      transition: theme.transitions.create('transform', {
-        duration: theme.transitions.duration.shortest,
-      }),
-    },
-  })
-);
-
 export const HistoryPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
-  const classes = cacheNutStyles();
   const [ clipItems, setClipboardItems ] = React.useState([] as ClipboardItem[]);
   const [ isClipsLoaded, setClipsLoaded ] = React.useState(false);
   const [ isMenuOpen, openMenu ] = React.useState(false);
@@ -188,7 +166,6 @@ export const HistoryPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
     const handleExpandClick = (): void => {
       setExpanded(!expanded);
     };
-    const cardTextClasses = useStyles();
 
     return (
       <Card variant="outlined">
@@ -197,7 +174,7 @@ export const HistoryPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
           action={
             <IconButton
               onClick={handleExpandClick}
-              className={expanded ? cardTextClasses.expand : cardTextClasses.expandOpen}
+              sx={expanded ? CacheNutStyles.expandClose : CacheNutStyles.expandOpen }
             >
               <ExpandMoreOutlined />
             </IconButton>
@@ -276,42 +253,42 @@ export const HistoryPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
           case 'image': {
             const imageItem = item.content as ClipboardUrlContent;
             return (
-              <GridListTile style={{height: 'auto'}}>
+              <ImageListItem style={{height: 'auto'}}>
                 <CardImage url={imageItem.url} ts={item.createTs} />
-              </GridListTile>
+              </ImageListItem>
             );
           }
           case 'url': {
             const urlItem = item.content as ClipboardUrlContent;
             return (
-              <GridListTile style={{height: 'auto'}}>
+              <ImageListItem style={{height: 'auto'}}>
                 <CardUrl url={urlItem.url} ts={item.createTs} />
-              </GridListTile>
+              </ImageListItem>
             );
           }
           case 'text':
           default: {
             const textItem = item.content as ClipboardTextContent;
             return (
-              <GridListTile style={{height: 'auto'}}>
+              <ImageListItem style={{height: 'auto'}}>
                 <CardText text={textItem.text} ts={item.createTs} />
-              </GridListTile>
+              </ImageListItem>
             );
           }
         }
       });
     } else {
       gridListItems = (
-        <GridListTile style={{height: 'auto'}}>
+        <ImageListItem style={{height: 'auto'}}>
           <Typography>Empty</Typography>
-        </GridListTile>
+        </ImageListItem>
       );
     }
   } else {
     gridListItems = (
-      <GridListTile style={{height: 'auto'}}>
+      <ImageListItem style={{height: 'auto'}}>
         <CircularProgress />
-      </GridListTile>
+      </ImageListItem>
     );
   }
   return (
@@ -326,7 +303,7 @@ export const HistoryPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
           >
             <MenuOutlined />
           </IconButton>
-          <Typography variant="h6" color="inherit" className={classes.title}>
+          <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
             Clipboard History
           </Typography>
           <IconButton
@@ -341,8 +318,8 @@ export const HistoryPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
       </AppBar>
       <CssBaseline />
       <Slide direction={slideDirection(slide)} in>
-        <Container className={classes.paper}>
-          <GridList cols={1}>{gridListItems}</GridList>
+        <Container sx={ CacheNutStyles.paper }>
+          <ImageList cols={1}>{gridListItems}</ImageList>
         </Container>
       </Slide>
       {ToastComponent(toast)}

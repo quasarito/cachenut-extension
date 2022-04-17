@@ -8,12 +8,12 @@ import {
   Slide,
   Toolbar,
   Typography,
-} from '@material-ui/core';
-import { LinkOutlined } from '@material-ui/icons';
-import { Alert } from '@material-ui/lab';
+} from '@mui/material';
+import { LinkOutlined } from '@mui/icons-material';
+import { Alert } from '@mui/lab';
 
 import {
-  cacheNutStyles,
+  CacheNutStyles,
   CancelActivationButton,
   formatCode,
   linkCodeFromPayloadHash,
@@ -48,7 +48,6 @@ function createConnectLinkCodeController(): ConnectLinkCodeController {
 export const ConnectLinkCodePage: React.FC<{slide?: SlideDirection;mock?: ConnectLinkCodeController;}> =
   ({mock, slide}) =>
 {
-  const classes = cacheNutStyles();
   const [ linkCode, setLinkCode ] = React.useState('');
   const controller = mock || createConnectLinkCodeController();
   const toast: Toast = {} as Toast;
@@ -87,7 +86,7 @@ export const ConnectLinkCodePage: React.FC<{slide?: SlideDirection;mock?: Connec
     <>
       <AppBar position="static">
         <Toolbar variant="dense">
-          <Typography variant="h6" color="inherit" className={classes.title}>
+          <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
             Link Code
           </Typography>
           <CancelActivationButton message="Quit account connection?" toast={toast} />
@@ -95,14 +94,14 @@ export const ConnectLinkCodePage: React.FC<{slide?: SlideDirection;mock?: Connec
       </AppBar>
       <CssBaseline />
       <Slide direction={slideDirection(slide)} in>
-        <Container className={classes.paper}>
+        <Container sx={ CacheNutStyles.paper }>
           <LinkOutlined fontSize="large" />
           {linkCodePrompt}
           {linkCodeElement}
           <Button
             variant="contained"
             color="primary"
-            className={classes.submit}
+            sx={ CacheNutStyles.submit }
             onClick={(): void => {
               if (linkCode && linkCode !== '!') {
                 navigateTo(<ConnectDeviceNamePage slide="next" />);

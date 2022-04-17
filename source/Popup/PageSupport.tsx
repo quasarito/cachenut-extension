@@ -3,16 +3,15 @@ import {
   createMuiTheme,
   Grow,
   IconButton,
-  makeStyles,
   Slide,
+  SlideProps,
   Snackbar,
   SnackbarContent,
+  SxProps,
   ThemeProvider,
-} from '@material-ui/core';
-// eslint-disable-next-line import/no-unresolved
-import { TransitionProps } from '@material-ui/core/transitions/transition';
-import { Close } from '@material-ui/icons';
-import { Alert } from '@material-ui/lab';
+} from '@mui/material';
+import { Close } from '@mui/icons-material';
+import { Alert } from '@mui/lab';
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import UAParser from 'ua-parser-js';
@@ -39,24 +38,33 @@ const cacheNutTheme = createMuiTheme({
   },
 });
 
-export const cacheNutStyles = makeStyles((theme) => ({
+export const CacheNutStyles = {
   paper: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2),
+    my: 2,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-  },
+  } as SxProps,
   submit: {
-    margin: theme.spacing(2, 0, 2),
-  },
+    mx: 0,
+    my: 2
+  } as SxProps,
   title: {
     flexGrow: 1,
-  },
+  } as SxProps,
   menuButton: {
-    marginRight: theme.spacing(2),
-  },
-}));
+    mr: 2,
+  } as SxProps,
+  expandClose: {
+    transform: 'rotate(0deg)',
+    ml: 'auto',
+    transition: "transform 250ms"
+  } as SxProps,
+  expandOpen: {
+    transform: 'rotate(180deg)',
+    transition: "transform 250ms"
+  } as SxProps
+};
 
 export type SlideDirection = 'next' | 'back' | 'start' | 'done';
 
@@ -76,7 +84,7 @@ export const slideDirection = (direction: SlideDirection | undefined): 'left' | 
 
 export const navigateTo = (
   page: React.ReactElement,
-  Transition?: React.ComponentType<TransitionProps & {children?: React.ReactElement}>
+  Transition?: React.ComponentType<SlideProps>
 ): void => {
   const rootElement =
     document.getElementById('popup-root') ||
@@ -182,7 +190,7 @@ export interface Toast {
 
 export const ToastComponent = (
   cb: Toast,
-  transition?: React.ComponentType<TransitionProps & {children?: React.ReactElement}>
+  transition?: React.ComponentType<SlideProps>
 ): JSX.Element =>
 {
   // React.ComponentType<TransitionProps & { children?: React.ReactElement<any, any> }>
@@ -262,7 +270,7 @@ export const ToastComponent = (
       setToastState({
         message,
         open: true,
-        transition: (props: TransitionProps) => (
+        transition: (props: SlideProps) => (
           <Slide {...props} direction="up" />
         ),
       });
@@ -277,7 +285,7 @@ export const ToastComponent = (
       key={toastState.message}
       autoHideDuration={5000}
       onClose={handleClose}
-      onExited={handleExited}
+      // onExited={handleExited}
     >
       {snackbarContent}
     </Snackbar>
@@ -286,7 +294,7 @@ export const ToastComponent = (
 
 export const CancelActivationButton: React.FC<{message: string; toast: Toast;}> = (props) => (
   <Button
-    color="default"
+    color="inherit" // was "default"
     onClick={(): void => {
       props.toast.prompt(props.message, ['Yes', 'No'])
       .then((answer) => {

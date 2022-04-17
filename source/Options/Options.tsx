@@ -11,60 +11,42 @@ import {
   CssBaseline,
   Divider,
   IconButton,
-  makeStyles,
+  SxProps,
   TextField,
   Toolbar,
   Typography,
-} from '@material-ui/core';
-import { ExpandMoreOutlined } from '@material-ui/icons';
-import { Alert } from '@material-ui/lab';
+} from '@mui/material';
+import { ExpandMoreOutlined } from '@mui/icons-material';
+import { Alert } from '@mui/lab';
 import * as React from 'react';
 import { browser } from 'webextension-polyfill-ts';
 import { parseCryptoKey } from '../CacheNut/Crypto';
 import { createHttpClient, register } from '../CacheNut/HttpClient';
 import { getLocalStorage, resetAccount, saveAccount, saveCryptoKey } from '../CacheNut/Model';
 // import {Logger} from '../CacheNut/Support';
-import { createDeviceName, Toast, ToastComponent } from '../Popup/PageSupport';
+import { CacheNutStyles, createDeviceName, Toast, ToastComponent } from '../Popup/PageSupport';
 
 // const logger = Logger('OptionsIndex');
 
-const optionsStyles = makeStyles((theme) => ({
+const OptionsStyles = {
   paper: {
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
+    my: 1,
     display: 'flex',
     flexDirection: 'column',
-  },
+  } as SxProps,
   card: {
-    paddingTop: theme.spacing(0),
-    paddingBottom: theme.spacing(0),
-  },
+    py: 0
+  } as SxProps,
   submit: {
-    margin: theme.spacing(1, 0, 1),
-  },
-  title: {
-    flexGrow: 1,
-  },
+    mx: 0,
+    my: 1
+  } as SxProps,
   menuButton: {
-    marginRight: theme.spacing(2),
-  },
-  expand: {
-    transform: 'rotate(0deg)',
-    marginLeft: 'auto',
-    transition: theme.transitions.create('transform', {
-      duration: theme.transitions.duration.shortest,
-    }),
-  },
-  expandOpen: {
-    transform: 'rotate(180deg)',
-    transition: theme.transitions.create('transform', {
-      duration: theme.transitions.duration.shortest,
-    }),
-  },
-}));
+    mr: 2,
+  } as SxProps
+};
 
 export const Options: React.FC = () => {
-  const classes = optionsStyles();
   const toast: Toast = {} as Toast;
 
   const resetData = (): void => {
@@ -159,7 +141,7 @@ export const Options: React.FC = () => {
       </AppBar>
       <CssBaseline />
       <Divider />
-      <Container className={classes.paper}>
+      <Container sx={ OptionsStyles.paper }>
         <Card variant="outlined">
           <CardHeader
             title="Sync account data"
@@ -170,7 +152,7 @@ export const Options: React.FC = () => {
               size="small"
               variant="contained"
               color="primary"
-              className={classes.submit}
+              sx={ OptionsStyles.submit }
               onClick={syncAccount}
             >
               Sync
@@ -187,7 +169,7 @@ export const Options: React.FC = () => {
               size="small"
               variant="contained"
               color="primary"
-              className={classes.submit}
+              sx={ OptionsStyles.submit }
               onClick={resetData}
             >
               Reset
@@ -199,7 +181,7 @@ export const Options: React.FC = () => {
             action={
               <IconButton
                 onClick={handleExpandClick}
-                className={expanded ? classes.expand : classes.expandOpen}
+                sx={expanded ? CacheNutStyles.expandClose : CacheNutStyles.expandOpen }
               >
                 <ExpandMoreOutlined />
               </IconButton>
@@ -208,7 +190,7 @@ export const Options: React.FC = () => {
             subheader="Add an account with known details."
           />
           <Collapse in={expanded} timeout="auto" unmountOnExit>
-            <CardContent className={classes.card}>
+            <CardContent sx={ OptionsStyles.card }>
               <Alert severity="warning">
                 For advanced use only! Current account details will be lost.
               </Alert>
@@ -216,7 +198,7 @@ export const Options: React.FC = () => {
                 <TextField
                   variant="outlined"
                   label="Account id"
-                  className={classes.paper}
+                  sx={ OptionsStyles.paper }
                   required
                   inputRef={accountIdField}
                   onChange={refreshOnChange(accountIdField.current?.value.length)}
@@ -228,10 +210,10 @@ export const Options: React.FC = () => {
                   variant="outlined"
                   label="Account key"
                   multiline
-                  className={classes.paper}
+                  sx={ OptionsStyles.paper }
                   required
                   rows={3}
-                  rowsMax={10}
+                  maxRows={10}
                   inputRef={accountKeyField}
                   onChange={refreshOnChange(accountKeyField.current?.value.length)}
                   error={accountKeyField.current?.value.trim().length === 0}
@@ -241,7 +223,7 @@ export const Options: React.FC = () => {
                 <TextField
                   variant="outlined"
                   label="Device name"
-                  className={classes.paper}
+                  sx={ OptionsStyles.paper }
                   required
                   defaultValue={createDeviceName()}
                   inputRef={deviceNameField}
@@ -255,7 +237,7 @@ export const Options: React.FC = () => {
                 size="small"
                 variant="contained"
                 color="primary"
-                className={classes.submit}
+                sx={ OptionsStyles.submit }
                 onClick={registerDirect}
               >
                 Register
