@@ -95,7 +95,7 @@ function createAddDeviceLinkCodeController(): AddDeviceLinkCodeController {
                 await postAccountAuth(activation.accessCode, accountAuth, activation.sharedKey);
                 return true;
               }
-              catch (err) {
+              catch (err: any) {
                 if (err.status === 404) {
                   throw new PageError('An error occurred. Please try again.', err);
                 }

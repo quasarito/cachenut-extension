@@ -75,7 +75,7 @@ function createConnectAccessCodeController(): ConnectAccessCodeController {
         };
         return await saveActivationData(data);
       }
-      catch (err) {
+      catch (err: any) {
         if (err.status === 404) {
           throw new PageError('Incorrect access code.', err);
         }
