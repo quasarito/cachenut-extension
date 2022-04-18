@@ -1,5 +1,3 @@
-import browser from 'webextension-polyfill';
-
 export interface CacheNutAccount {
   id: string;
   deviceId: string;
@@ -56,10 +54,16 @@ export type ClipboardUrlContent = {url: string} & ClipboardContent;
 export type ClipboardTextContent = {text: string} & ClipboardContent;
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const getLocalStorage = () => browser.storage.local;
+export const getLocalStorage = async () => {
+  const browser = await import('webextension-polyfill');
+  return browser.storage.local;
+};
+
+export const storeSettings = async (settings: Record<string, string>) => (await getLocalStorage()).set(settings);
+export const readSettings = async (keys?: string|string[]) => (await getLocalStorage()).get(keys);
 
 export const loadAccount = async (): Promise<CacheNutAccount> => {
-  const accountItems = await getLocalStorage().get([ACCOUNT_ID, ACCOUNT_DEVICE_ID, ACCOUNT_TOKEN]);
+  const accountItems = await readSettings([ACCOUNT_ID, ACCOUNT_DEVICE_ID, ACCOUNT_TOKEN]);
   if (accountItems.accountId) {
     return {
       id: accountItems.accountId,
@@ -71,8 +75,7 @@ export const loadAccount = async (): Promise<CacheNutAccount> => {
 };
 
 export const saveAccount = async (account: CacheNutAccount): Promise<boolean> =>
-  getLocalStorage()
-    .set({
+  storeSettings({
       accountId: account.id,
       accountDeviceId: account.deviceId,
       accountToken: account.token,
@@ -80,10 +83,10 @@ export const saveAccount = async (account: CacheNutAccount): Promise<boolean> =>
     .then(() => true)
     .catch(() => false);
 
-export const resetAccount = async (): Promise<void> => getLocalStorage().clear();
+export const resetAccount = async (): Promise<void> => (await getLocalStorage()).clear();
 
 export const loadCryptoKey = async (): Promise<CryptoKey | null> => {
-  const keyItem = await getLocalStorage().get(ACCOUNT_CRYPTO_KEY);
+  const keyItem = await readSettings(ACCOUNT_CRYPTO_KEY);
   if (keyItem[ACCOUNT_CRYPTO_KEY]) {
     const c = crypto.subtle;
     return c.importKey(
@@ -101,14 +104,13 @@ export const saveCryptoKey = async (key: CryptoKey): Promise<boolean> => {
   const c = crypto.subtle;
   const keyJwk = await c.exportKey('jwk', key);
 
-  return getLocalStorage()
-    .set({accountCryptoKey: JSON.stringify(keyJwk)})
+  return storeSettings({accountCryptoKey: JSON.stringify(keyJwk)})
     .then(() => true)
     .catch(() => false);
 };
 
 export const loadActivationData = async (): Promise<ActivationData | null> => {
-  const keyItem = await getLocalStorage().get([
+  const keyItem = await readSettings([
     STEP,
     STEP_ACCESS_CODE,
     STEP_PRIVATE_KEY,
@@ -188,18 +190,16 @@ export const saveActivationData = async (data: ActivationData): Promise<boolean>
     dataToStore[STEP_SECOND_HASH] = data.secondHash;
   }
 
-  return getLocalStorage()
-    .set(dataToStore)
+  return storeSettings(dataToStore)
     .then(() => true)
     .catch(() => false);
 };
 
 async function resetLocalStorageData(prefix: string): Promise<void> {
-  return getLocalStorage()
-    .get()
+  return readSettings()
     .then(async (allData) => {
       const keys = Object.keys(allData).filter((k) => k.startsWith(prefix));
-      return getLocalStorage().remove(keys);
+      return (await getLocalStorage()).remove(keys);
     });
 }
 

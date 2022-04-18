@@ -211,8 +211,8 @@ export const ToastComponent = (
     setExitCallbacks([]);
   };
   const clickClose = (): void => {
-    handleExited();
     handleClose();
+    handleExited();
   };
   const toastContent = (message: string): JSX.Element => (
     <SnackbarContent
@@ -288,8 +288,7 @@ export const ToastComponent = (
       TransitionComponent={toastState.transition}
       key={toastState.message}
       autoHideDuration={5000}
-      onClose={handleClose}
-      // onExited={handleExited}
+      onClose={handleExited}
     >
       {snackbarContent}
     </Snackbar>
@@ -318,4 +317,20 @@ export class PageError extends Error {
   constructor(readonly message: string, readonly thrown: unknown) {
     super();
   }
-}
+};
+
+// Note: webextension-polyfill is lazy-imported to avoid errors in Storybook
+export const sendMessage = async (message: any) => {
+  const browser = await import('webextension-polyfill');
+  return browser.runtime.sendMessage(message);
+};
+
+export const createTab = async (url: string) => {
+  const browser = await import('webextension-polyfill');
+  return browser.tabs.create({url});
+};
+
+export const activeTab = async () => {
+  const browser = await import('webextension-polyfill');
+  return browser.tabs.query({active: true});
+};

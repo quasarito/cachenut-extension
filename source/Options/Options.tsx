@@ -19,12 +19,11 @@ import {
 } from '@mui/material';
 import { ExpandMoreOutlined } from '@mui/icons-material';
 import * as React from 'react';
-import browser from 'webextension-polyfill';
 import { parseCryptoKey } from '../CacheNut/Crypto';
 import { createHttpClient, register } from '../CacheNut/HttpClient';
-import { getLocalStorage, resetAccount, saveAccount, saveCryptoKey } from '../CacheNut/Model';
+import { resetAccount, saveAccount, saveCryptoKey, storeSettings } from '../CacheNut/Model';
 // import {Logger} from '../CacheNut/Support';
-import { CacheNutStyles, createDeviceName, Toast, ToastComponent } from '../Popup/PageSupport';
+import { CacheNutStyles, createDeviceName, sendMessage, Toast, ToastComponent } from '../Popup/PageSupport';
 
 // const logger = Logger('OptionsIndex');
 
@@ -55,7 +54,7 @@ export const Options: React.FC = () => {
       if (answer === 'Confirm') {
         resetAccount() // remove account info from local storage
         .then(() => {
-          browser.runtime.sendMessage({event: 'unlinked'});
+          sendMessage({event: 'unlinked'});
         });
       }
     });
@@ -64,7 +63,7 @@ export const Options: React.FC = () => {
   const syncAccount = (): void => {
     createHttpClient()
     .then(async (client) => client.syncDeviceInfo())
-    .then(async (device) => getLocalStorage().set({accountDeviceId: device.deviceId}))
+    .then(async (device) => storeSettings({accountDeviceId: device.deviceId}))
     .then(async () => toast.success('Synced.'));
   };
 
@@ -97,7 +96,7 @@ export const Options: React.FC = () => {
     }
     else {
       resetAccount() // remove account info from local storage
-      .then(() => { browser.runtime.sendMessage({event: 'unlinked'}); })
+      .then(() => sendMessage({event: 'unlinked'}))
       .then(async () => saveCryptoKey(await parseCryptoKey(accountKey)))
       .then((savedKey) => {
         if (savedKey) {
@@ -105,7 +104,7 @@ export const Options: React.FC = () => {
           .then(async (account) => saveAccount(account))
           .then((savedAccount) => {
             if (savedAccount) {
-              browser.runtime.sendMessage({event: 'linked'});
+              sendMessage({event: 'linked'});
               toast.success('Registered.');
             } else {
               toast.error('Unable to save account key.');

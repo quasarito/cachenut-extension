@@ -2,7 +2,6 @@ import * as React from 'react';
 
 import {
   AppBar,
-  Button,
   Container,
   CssBaseline,
   IconButton,
@@ -11,13 +10,14 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import { ArrowBackOutlined, PostAddOutlined } from '@mui/icons-material';
-import browser from 'webextension-polyfill';
 
 import {
   CacheNutStyles,
   createDeviceName,
   navigateTo,
+  sendMessage,
   slideDirection,
   SlideDirection,
   Toast,
@@ -39,7 +39,7 @@ function createNewAccountPageController(): NewAccountPageController {
           // generate the encryption key for the new account
           const cryptoKey = await createCryptoKey();
           if (await saveCryptoKey(cryptoKey)) {
-            browser.runtime.sendMessage({event: 'linked'});
+            await sendMessage({event: 'linked'});
             return [account, null];
           }
           return [ null, 'Unable to create account key.' ];
@@ -55,6 +55,7 @@ export const NewAccountPage: React.FC<{slide?: SlideDirection; mock?: NewAccount
   const toast: Toast = {} as Toast;
   const controller = mock || createNewAccountPageController();
   const defaultName = createDeviceName();
+  const [ registering, setRegistering ] = React.useState(false);
 
   return <>
     <AppBar position="static">
@@ -78,11 +79,13 @@ export const NewAccountPage: React.FC<{slide?: SlideDirection; mock?: NewAccount
         <PostAddOutlined fontSize="large" />
         Create a new account for this device.
         <TextField fullWidth label="Device name" defaultValue={defaultName} inputRef={deviceNameField} />
-        <Button
+        <LoadingButton
           variant="contained"
           color="primary"
           sx={ CacheNutStyles.submit }
-          onClick={(): Promise<void> =>
+          loading={registering}
+          onClick={() => {
+            setRegistering(true);
             controller.createAccount(deviceNameField.current)
             .then(([account, err]) => {
               if (account) {
@@ -92,15 +95,17 @@ export const NewAccountPage: React.FC<{slide?: SlideDirection; mock?: NewAccount
               }
               else if (err) {
                 toast.error(err);
+                setRegistering(false);
               }
             })
             .catch(() => {
               toast.error('Unable to save account. Try again.');
+              setRegistering(false);
             })
-          }
+          }}
         >
           Register
-        </Button>
+        </LoadingButton>
       </Container>
     </Slide>
     {ToastComponent(toast)}

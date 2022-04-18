@@ -86,6 +86,9 @@ export class CacheNutHttpClient {
 
   async loadDeviceList(): Promise<Device[]> {
     const { json } = await this.doHttpGetWithAuth<Device[]>(url('accounts/manage/devices'));
+    json.forEach(device => {
+      device.createDate = new Date(device.createDate); // coerce to Date from string
+    });
     return json;
   }
 
@@ -102,6 +105,7 @@ export class CacheNutHttpClient {
 
   async syncDeviceInfo(): Promise<Device> {
     const { json } = await this.doHttpGetWithAuth<Device>(url('accounts/manage/devices/current'));
+    json.createDate = new Date(json.createDate); // coerce to Date from string
     return json;
   }
 

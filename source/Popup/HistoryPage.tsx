@@ -35,11 +35,13 @@ import {
   RefreshOutlined,
   TextFieldsOutlined,
 } from '@mui/icons-material';
-import browser from 'webextension-polyfill';
 
 import {
+  activeTab,
   CacheNutStyles,
+  createTab,
   navigateTo,
+  sendMessage,
   slideDirection,
   SlideDirection,
   timeElapsed,
@@ -133,9 +135,7 @@ export const HistoryPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
         <Tooltip title="Open URL in new tab">
           <Button
             size="small"
-            onClick={(): void => {
-              browser.tabs.create({url});
-            }}
+            onClick={() => createTab(url)}
           >
             <OpenInNewOutlined />
           </Button>
@@ -207,7 +207,7 @@ export const HistoryPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
           onClick={(): void => {
             createHttpClient()
             .then(async (client) => {
-              const tabs = await browser.tabs.query({active: true});
+              const tabs = await activeTab();
               if (tabs.length > 0) {
                 await client.cache({
                   type: 'url',
@@ -223,7 +223,7 @@ export const HistoryPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
         <ListItemText
           primary="Copy clipboard content"
           onClick={(): void => {
-            browser.runtime.sendMessage({event: 'copyclipboard'})
+            sendMessage({event: 'copyclipboard'})
             .then((copied) => {
               if (copied) {
                 toast.success('Clipboard copied to Cache Nut.');

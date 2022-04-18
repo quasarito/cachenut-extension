@@ -1,10 +1,10 @@
 import * as React from 'react';
 
 import { AppBar, Button, Container, CssBaseline, IconButton, Slide, Toolbar, Typography } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import { AccountBoxOutlined, ArrowBackOutlined, HowToRegOutlined } from '@mui/icons-material';
-import browser from 'webextension-polyfill';
 
-import { CacheNutStyles, navigateTo, slideDirection, SlideDirection, Toast, ToastComponent } from './PageSupport';
+import { CacheNutStyles, navigateTo, sendMessage, slideDirection, SlideDirection, Toast, ToastComponent } from './PageSupport';
 import { HistoryPage } from './HistoryPage';
 import { UnregisteredPage } from './UnregisteredPage';
 import { resetAccount, loadAccount, Device, CacheNutAccount } from '../CacheNut/Model';
@@ -17,7 +17,7 @@ function createAccountPageController(): AccountPageController {
     getAccount: async (): Promise<CacheNutAccount> => loadAccount(),
     getDeviceList: async (): Promise<Device[]> => createHttpClient().then(async (client) => client.loadDeviceList()),
     disconnect: async (): Promise<void> => resetAccount().then(() => { // remove account info from local storage
-      browser.runtime.sendMessage({event: 'unlinked'});
+      sendMessage({event: 'unlinked'});
     })
   };
 }
@@ -29,6 +29,7 @@ function addNewDeviceClicked(): void {
 export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageController;}> = ({mock, slide}) => {
   const [ account, setAccount ] = React.useState({} as CacheNutAccount);
   const [ deviceList, setDeviceList ] = React.useState([] as Device[]);
+  const [ disconnecting, setDisconnecting ] = React.useState(false);
   const toast: Toast = {} as Toast;
   const controller = mock || createAccountPageController();
 
@@ -75,22 +76,25 @@ export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageCo
         <Typography gutterBottom>
           {account.id ? account.deviceId : 'No active device'}
         </Typography>
-        <Button
+        <LoadingButton
           variant="outlined"
           color="primary"
           sx={ CacheNutStyles.submit }
+          loading={disconnecting}
           onClick={(): void => {
+            setDisconnecting(true);
             controller
               .disconnect()
               .then(async () => toast.message('Disconnected.'))
               .then(() => navigateTo(<UnregisteredPage />))
-              .catch(async () =>
-                toast.error('An error occurred. Try again.')
-              );
+              .catch(async () => {
+                toast.error('An error occurred. Try again.');
+                setDisconnecting(false);
+              });
           }}
         >
           Disconnect from account
-        </Button>
+        </LoadingButton>
         Connected:
         <Typography gutterBottom>
           {deviceList.length||'#'} {deviceList.length === 1 ? 'device' : 'devices'}
@@ -99,6 +103,7 @@ export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageCo
           variant="outlined"
           color="primary"
           sx={ CacheNutStyles.submit }
+          disabled={disconnecting}
           onClick={(): void => navigateTo(<ManageDevicesPage slide="next" />)}
         >
           Manage devices
@@ -107,6 +112,7 @@ export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageCo
           variant="contained"
           color="primary"
           sx={ CacheNutStyles.submit }
+          disabled={disconnecting}
           onClick={addNewDeviceClicked}
         >
           Add a new device

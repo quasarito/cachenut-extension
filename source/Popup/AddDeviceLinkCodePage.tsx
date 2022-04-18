@@ -1,6 +1,7 @@
 import * as React from 'react';
 
-import { AppBar, Button, Container, CssBaseline, Slide, TextField, Toolbar, Typography } from '@mui/material';
+import { AppBar, Container, CssBaseline, Slide, TextField, Toolbar, Typography } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import { LinkOutlined } from '@mui/icons-material';
 
 import {
@@ -116,6 +117,7 @@ export const AddDeviceLinkCodePage: React.FC<{slide?: SlideDirection; mock?: Add
 {
   const linkCodeField = React.useRef();
   const [linkCode, setLinkCode] = React.useState('');
+  const [ authorizing, setAuthorizing ] = React.useState(false);
   const controller = mock || createAddDeviceLinkCodeController();
   const toast: Toast = {} as Toast;
 
@@ -145,11 +147,13 @@ export const AddDeviceLinkCodePage: React.FC<{slide?: SlideDirection; mock?: Add
           <LinkOutlined fontSize="large" />
           Complete the link code displayed by the new device.
           <TextField fullWidth label="Link code" inputRef={linkCodeField} />
-          <Button
+          <LoadingButton
             variant="contained"
             color="primary"
             sx={ CacheNutStyles.submit }
+            loading={authorizing}
             onClick={(): void => {
+              setAuthorizing(true);
               controller.validateLinkCode(linkCodeField.current)
               .then((validated) => {
                 if (validated) {
@@ -157,12 +161,13 @@ export const AddDeviceLinkCodePage: React.FC<{slide?: SlideDirection; mock?: Add
                 }
                 else {
                   toast.error('Invalid link code.');
+                  setAuthorizing(false);
                 }
               });
             }}
           >
             Authorize
-          </Button>
+          </LoadingButton>
         </Container>
       </Slide>
       {ToastComponent(toast)}
