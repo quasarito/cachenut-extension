@@ -1,0 +1,51 @@
+{
+  "manifest_version": 3,
+  "name": "Cache Nut",
+  "author": "Huy Duong",
+  "version": "0.1.0",
+
+  "icons": {
+    "16": "assets/icons/cachenut-acorn-16.png",
+    "32": "assets/icons/cachenut-acorn-32.png",
+    "48": "assets/icons/cachenut-acorn-48.png",
+    "96": "assets/icons/cachenut-acorn-96.png",
+    "128": "assets/icons/cachenut-acorn-128.png"
+  },
+  "description": "Clipboard across browsers",
+  "homepage_url": "https://cachenut.com",
+  "short_name": "Cache Nut",
+
+  "permissions": [
+    "activeTab",
+    "bookmarks",
+    "clipboardRead",
+    "clipboardWrite",
+    "contextMenus",
+    "storage"
+  ],
+
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "assets/icons/cachenut-acorn-16.png",
+      "32": "assets/icons/cachenut-acorn-32.png",
+      "48": "assets/icons/cachenut-acorn-48.png",
+      "96": "assets/icons/cachenut-acorn-96.png",
+      "128": "assets/icons/cachenut-acorn-128.png"
+    },
+    "default_title": "Cache Nut"
+  },
+
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  },
+
+  "background": {
+    "service_worker": "js/background.bundle.js"
+  }
+}
