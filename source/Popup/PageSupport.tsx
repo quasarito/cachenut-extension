@@ -83,32 +83,16 @@ export const slideDirection = (direction: SlideDirection | undefined): 'left' | 
   }
 };
 
-export const navigateTo = (
-  page: React.ReactElement,
-  Transition?: React.ComponentType<SlideProps>
-): void => {
-  const rootElement =
-    document.getElementById('popup-root') ||
-    document.getElementById('options-root') ||
-    document.getElementById('root');
-  if (Transition) {
-    ReactDOM.render(
-      <StyledEngineProvider injectFirst>
-        <ThemeProvider theme={cacheNutTheme}>
-          <Transition>{page}</Transition>
-        </ThemeProvider>
-      </StyledEngineProvider>,
-      rootElement
-    );
-  }
-  else {
-    ReactDOM.render(
-      <StyledEngineProvider injectFirst>
-        <ThemeProvider theme={cacheNutTheme}>{page}</ThemeProvider>
-      </StyledEngineProvider>,
-      rootElement
-    );
-  }
+export const navigateTo = (page: React.ReactElement): void => {
+  const rootElement = document.getElementById('popup-root')
+    || document.getElementById('options-root')
+    || document.getElementById('root');
+  ReactDOM.render(
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={cacheNutTheme}>{page}</ThemeProvider>
+    </StyledEngineProvider>,
+    rootElement
+  );
 };
 
 export const stripNonAlphanumeric = (value: string): string => {
@@ -288,18 +272,18 @@ export const ToastComponent = (
       TransitionComponent={toastState.transition}
       key={toastState.message}
       autoHideDuration={5000}
-      onClose={handleExited}
+      onClose={clickClose}
     >
       {snackbarContent}
     </Snackbar>
   );
 };
 
-export const CancelActivationButton: React.FC<{message: string; toast: Toast;}> = (props) => (
+export const CancelActivationButton: React.FC<{message: string; toast: Toast;}> = ({ message, toast }) => (
   <Button
     color="inherit" // was "default"
     onClick={(): void => {
-      props.toast.prompt(props.message, ['Yes', 'No'])
+      toast.prompt(message, ['Yes', 'No'])
       .then((answer) => {
         logger.log(`CancelActivationButton: ${answer}`);
         if (answer === 'Yes') {
@@ -320,17 +304,21 @@ export class PageError extends Error {
 };
 
 // Note: webextension-polyfill is lazy-imported to avoid errors in Storybook
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const sendMessage = async (message: any) => {
+  // eslint-disable-next-line node/no-unsupported-features/es-syntax
   const browser = await import('webextension-polyfill');
   return browser.runtime.sendMessage(message);
 };
 
 export const createTab = async (url: string) => {
+  // eslint-disable-next-line node/no-unsupported-features/es-syntax
   const browser = await import('webextension-polyfill');
   return browser.tabs.create({url});
 };
 
 export const activeTab = async () => {
+  // eslint-disable-next-line node/no-unsupported-features/es-syntax
   const browser = await import('webextension-polyfill');
   return browser.tabs.query({active: true});
 };

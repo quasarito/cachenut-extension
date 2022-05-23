@@ -20,7 +20,15 @@ import {
 } from '@mui/material';
 import { ArrowBackOutlined, DeleteOutlined, VerifiedUserOutlined } from '@mui/icons-material';
 
-import { CacheNutStyles, navigateTo, slideDirection, SlideDirection, timeElapsed, Toast, ToastComponent } from './PageSupport';
+import {
+  CacheNutStyles,
+  navigateTo,
+  slideDirection,
+  SlideDirection,
+  timeElapsed,
+  Toast,
+  ToastComponent
+} from './PageSupport';
 import { Logger } from '../CacheNut/Support';
 import { AccountPage } from './AccountPage';
 import { CacheNutAccount, Device, loadAccount } from '../CacheNut/Model';
@@ -96,7 +104,9 @@ export const ManageDevicesPage: React.FC<{slide?: SlideDirection}> = ({slide}) =
           />
         </Tooltip>
       </ListItemIcon>
-      <Tooltip title={`Device id: ${device.deviceId}, Last access: ${device.createDate.toLocaleString()}`} enterDelay={1000}>
+      <Tooltip
+        title={`Device id: ${device.deviceId}, Last access: ${device.createDate.toLocaleString()}`}
+        enterDelay={1000}>
         <ListItemText
           primary={device.name}
           secondary={

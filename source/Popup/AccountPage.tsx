@@ -1,10 +1,28 @@
 import * as React from 'react';
 
-import { AppBar, Button, Container, CssBaseline, IconButton, Slide, Toolbar, Typography } from '@mui/material';
+import {
+  AppBar,
+  Button,
+  Container,
+  CssBaseline,
+  Divider,
+  IconButton,
+  Slide,
+  Toolbar,
+  Typography
+} from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { AccountBoxOutlined, ArrowBackOutlined, HowToRegOutlined } from '@mui/icons-material';
 
-import { CacheNutStyles, navigateTo, sendMessage, slideDirection, SlideDirection, Toast, ToastComponent } from './PageSupport';
+import {
+  CacheNutStyles,
+  navigateTo,
+  sendMessage,
+  slideDirection,
+  SlideDirection,
+  Toast,
+  ToastComponent
+} from './PageSupport';
 import { HistoryPage } from './HistoryPage';
 import { UnregisteredPage } from './UnregisteredPage';
 import { resetAccount, loadAccount, Device, CacheNutAccount } from '../CacheNut/Model';
@@ -68,14 +86,26 @@ export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageCo
     <Slide direction={slideDirection(slide)} in>
       <Container sx={ CacheNutStyles.paper }>
         {account.id ? (<HowToRegOutlined fontSize="large" />) : (<AccountBoxOutlined fontSize="large" />)}
-        Account id:
-        <Typography gutterBottom>
-          {account.id ? account.id : 'No active account'}
-        </Typography>
-        Device id:
-        <Typography gutterBottom>
-          {account.id ? account.deviceId : 'No active device'}
-        </Typography>
+        Connected:
+        <Typography gutterBottom>{deviceList.length||'#'} {deviceList.length === 1 ? 'device' : 'devices'}</Typography>
+        <Button
+          variant="outlined"
+          color="primary"
+          sx={ CacheNutStyles.submit }
+          disabled={disconnecting}
+          onClick={(): void => navigateTo(<ManageDevicesPage slide="next" />)}
+        >
+          Manage devices
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          sx={ CacheNutStyles.submit }
+          disabled={disconnecting}
+          onClick={addNewDeviceClicked}
+        >
+          Add a new device
+        </Button>
         <LoadingButton
           variant="outlined"
           color="primary"
@@ -95,28 +125,14 @@ export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageCo
         >
           Disconnect from account
         </LoadingButton>
-        Connected:
+        <Divider>Account id:</Divider>
         <Typography gutterBottom>
-          {deviceList.length||'#'} {deviceList.length === 1 ? 'device' : 'devices'}
+          {account.id ? account.id : 'No active account'}
         </Typography>
-        <Button
-          variant="outlined"
-          color="primary"
-          sx={ CacheNutStyles.submit }
-          disabled={disconnecting}
-          onClick={(): void => navigateTo(<ManageDevicesPage slide="next" />)}
-        >
-          Manage devices
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          sx={ CacheNutStyles.submit }
-          disabled={disconnecting}
-          onClick={addNewDeviceClicked}
-        >
-          Add a new device
-        </Button>
+        <Divider>Device id:</Divider>
+        <Typography gutterBottom>
+          {account.id ? account.deviceId : 'No active device'}
+        </Typography>
       </Container>
     </Slide>
     {ToastComponent(toast)}

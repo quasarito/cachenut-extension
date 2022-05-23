@@ -3,7 +3,6 @@ import * as React from 'react';
 import {
   AppBar,
   Avatar,
-  Button,
   Card,
   CardActions,
   CardContent,
@@ -18,12 +17,12 @@ import {
   ImageListItem,
   IconButton,
   List,
-  ListItem,
   ListItemText,
   Slide,
   Toolbar,
   Tooltip,
   Typography,
+  ListItemButton,
 } from '@mui/material';
 import {
   ExpandMoreOutlined,
@@ -41,7 +40,6 @@ import {
   CacheNutStyles,
   createTab,
   navigateTo,
-  sendMessage,
   slideDirection,
   SlideDirection,
   timeElapsed,
@@ -57,6 +55,7 @@ import {
 } from '../CacheNut/Model';
 import { Logger } from '../CacheNut/Support';
 import { createHttpClient } from '../CacheNut/HttpClient';
+import { CopyContentPage } from './CopyContentPage';
 
 const logger = Logger('HistoryPage');
 
@@ -80,14 +79,19 @@ function ellipsisTooltip(text: string): string | JSX.Element {
   return text;
 }
 
-async function loadClipboardItems(): Promise<ClipboardItem[]> {
-  return createHttpClient().then(async (client) => client.list());
+function createHistoryController(): HistoryController {
+  return {
+    loadClipboardItems: async (): Promise<ClipboardItem[]> => {
+      return createHttpClient().then(async (client) => client.list());
+    }    
+  }
 }
 
-export const HistoryPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
+export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryController;}> = ({mock,slide}) => {
   const [ clipItems, setClipboardItems ] = React.useState([] as ClipboardItem[]);
   const [ isClipsLoaded, setClipsLoaded ] = React.useState(false);
   const [ isMenuOpen, openMenu ] = React.useState(false);
+  const controller = mock || createHistoryController();
   const toggleMenuDrawer = () => (): void => {
     openMenu(true);
   };
@@ -96,7 +100,7 @@ export const HistoryPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
   React.useEffect(() => {
     if (!isClipsLoaded) {
       logger.log('Clipboard items loading...');
-      loadClipboardItems()
+      controller.loadClipboardItems()
       .then((items) => {
         setClipsLoaded(true);
         setClipboardItems(items);
@@ -119,49 +123,65 @@ export const HistoryPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
     }
   };
 
-  const CardUrl: React.FC<{url: string; ts: number | Date}> = ({url, ts}) => (
+  const elapsedOrExpiredDuration = (ts: number | Date, expires: number | Date | undefined): string => {
+    const SECONDS_TO_EXPIRED = 5;
+    const expiresDate = new Date(expires || 0);
+    const remaining = expiresDate.getTime() - Date.now();
+    if (remaining < SECONDS_TO_EXPIRED*60*1000) {
+      // timeElapsed expects a timestamp in the past for calculation, so subtract remaining from
+      // current time to get duration to expiration
+      return `Expires in ${timeElapsed(Date.now() - remaining)}`;
+    }
+    return `Added ${timeElapsed(ts)} ago`;
+  };
+
+  const CardUrl: React.FC<{url: string; ts: number | Date; expires: number | Date | undefined;}> =
+  ({url, ts, expires}) => (
     <Card variant="outlined">
       <CardHeader
         avatar={<Avatar><LinkOutlined /></Avatar>}
         title={ellipsisTooltip(url)}
-        subheader={`${timeElapsed(ts)} ago`}
+        subheader={elapsedOrExpiredDuration(ts, expires)}
       />
       <CardActions>
         <Tooltip title="Copy to clipboard">
-          <Button size="small" onClick={copyToClipboard(url)}>
+          <IconButton color="primary" size="small" onClick={copyToClipboard(url)}>
             <FileCopyOutlined />
-          </Button>
+          </IconButton>
         </Tooltip>
         <Tooltip title="Open URL in new tab">
-          <Button
+          <IconButton
+            color="primary"
             size="small"
-            onClick={() => createTab(url)}
+            onClick={(): void => { createTab(url); }}
           >
             <OpenInNewOutlined />
-          </Button>
+          </IconButton>
         </Tooltip>
       </CardActions>
     </Card>
   );
 
-  const CardImage: React.FC<{url: string; ts: number | Date}> = ({url, ts}) => (
+  const CardImage: React.FC<{url: string; ts: number | Date; expires: number | Date | undefined;}> =
+  ({url, ts, expires}) => (
     <Card variant="outlined">
       <CardHeader
         avatar={<Avatar><ImageOutlined /></Avatar>}
         title={ellipsisTooltip(url)}
-        subheader={`${timeElapsed(ts)} ago`}
+        subheader={elapsedOrExpiredDuration(ts, expires)}
       />
       <CardActions>
         <Tooltip title="Copy to clipboard">
-          <Button size="small" onClick={copyToClipboard(url)}>
+          <IconButton color="primary" size="small" onClick={copyToClipboard(url)}>
             <FileCopyOutlined />
-          </Button>
+          </IconButton>
         </Tooltip>
       </CardActions>
     </Card>
   );
 
-  const CardText: React.FC<{text: string; ts: number | Date}> = ({text,ts}) => {
+  const CardText: React.FC<{text: string; ts: number | Date; expires: number | Date | undefined;}> =
+  ({text, ts, expires}) => {
     const [expanded, setExpanded] = React.useState(false);
     const handleExpandClick = (): void => {
       setExpanded(!expanded);
@@ -180,7 +200,7 @@ export const HistoryPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
             </IconButton>
           }
           title={ellipsis(text)}
-          subheader={`${timeElapsed(ts)} ago`}
+          subheader={elapsedOrExpiredDuration(ts, expires)}
         />
         <Collapse in={expanded} timeout="auto" unmountOnExit>
           <CardContent>
@@ -189,9 +209,9 @@ export const HistoryPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
         </Collapse>
         <CardActions>
           <Tooltip title="Copy to clipboard">
-            <Button size="small" onClick={copyToClipboard(text)}>
+            <IconButton color="primary" size="small" onClick={copyToClipboard(text)}>
               <FileCopyOutlined />
-            </Button>
+            </IconButton>
           </Tooltip>
         </CardActions>
       </Card>
@@ -201,47 +221,28 @@ export const HistoryPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const menuItems = () => (
     <List>
-      <ListItem button key="copyTabLocation">
-        <ListItemText
-          primary="Copy tab location"
-          onClick={(): void => {
-            createHttpClient()
-            .then(async (client) => {
-              const tabs = await activeTab();
-              if (tabs.length > 0) {
-                await client.cache({
-                  type: 'url',
-                  url: tabs[0].url,
-                } as ClipboardContent);
-                await toast.success('Tab location copied to Cache Nut.');
-              }
-            });
-          }}
-        />
-      </ListItem>
-      <ListItem button key="copyClipboardContent">
-        <ListItemText
-          primary="Copy clipboard content"
-          onClick={(): void => {
-            sendMessage({event: 'copyclipboard'})
-            .then((copied) => {
-              if (copied) {
-                toast.success('Clipboard copied to Cache Nut.');
-              }
-              else {
-                toast.warning('Clipboard access not available.');
-              }
-            });
-          }}
-        />
-      </ListItem>
+      <ListItemButton onClick={(): void => {
+        createHttpClient()
+        .then(async (client) => {
+          const tabs = await activeTab();
+          if (tabs.length > 0) {
+            await client.cache({
+              type: 'url',
+              url: tabs[0].url,
+            } as ClipboardContent);
+            await toast.success('Tab location copied to Cache Nut.');
+          }
+        });
+      }}>
+        <ListItemText primary="Copy tab location" />
+      </ListItemButton>
+      <ListItemButton onClick={(): void => navigateTo(<CopyContentPage slide="next" />)}>
+        <ListItemText primary="Copy clipboard content" />
+      </ListItemButton>
       <Divider />
-      <ListItem button key="account">
-        <ListItemText
-          primary="Account"
-          onClick={(): void => navigateTo(<AccountPage slide="next" />)}
-        />
-      </ListItem>
+      <ListItemButton onClick={(): void => navigateTo(<AccountPage slide="next" />)}>
+        <ListItemText primary="Account" />
+      </ListItemButton>
     </List>
   );
 
@@ -254,7 +255,7 @@ export const HistoryPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
             const imageItem = item.content as ClipboardUrlContent;
             return (
               <ImageListItem style={{height: 'auto'}}>
-                <CardImage url={imageItem.url} ts={item.createTs} />
+                <CardImage url={imageItem.url} ts={item.createTs} expires={item.expiresAt} />
               </ImageListItem>
             );
           }
@@ -262,7 +263,7 @@ export const HistoryPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
             const urlItem = item.content as ClipboardUrlContent;
             return (
               <ImageListItem style={{height: 'auto'}}>
-                <CardUrl url={urlItem.url} ts={item.createTs} />
+                <CardUrl url={urlItem.url} ts={item.createTs} expires={item.expiresAt} />
               </ImageListItem>
             );
           }
@@ -271,7 +272,7 @@ export const HistoryPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
             const textItem = item.content as ClipboardTextContent;
             return (
               <ImageListItem style={{height: 'auto'}}>
-                <CardText text={textItem.text} ts={item.createTs} />
+                <CardText text={textItem.text} ts={item.createTs} expires={item.expiresAt} />
               </ImageListItem>
             );
           }
@@ -327,3 +328,7 @@ export const HistoryPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
     </Drawer>
   </>;
 };
+
+export interface HistoryController {
+  loadClipboardItems(): Promise<ClipboardItem[]>;
+}

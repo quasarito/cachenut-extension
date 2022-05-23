@@ -53,14 +53,25 @@ export interface ClipboardContent {
 export type ClipboardUrlContent = {url: string} & ClipboardContent;
 export type ClipboardTextContent = {text: string} & ClipboardContent;
 
+export const createClipboardContent = (value: string): ClipboardTextContent | ClipboardUrlContent => {
+  if (/^https?:\/\/[a-zA-Z0-9]/.test(value)) {
+    return { type: 'url', url: value };
+  }
+  return { type: 'text', text: value };
+};
+
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const getLocalStorage = async () => {
+  // eslint-disable-next-line node/no-unsupported-features/es-syntax
   const browser = await import('webextension-polyfill');
   return browser.storage.local;
 };
 
-export const storeSettings = async (settings: Record<string, string>) => (await getLocalStorage()).set(settings);
-export const readSettings = async (keys?: string|string[]) => (await getLocalStorage()).get(keys);
+export const storeSettings =
+  async (settings: Record<string, string>): Promise<void> => (await getLocalStorage()).set(settings);
+export const readSettings =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async (keys?: string|string[]): Promise<Record<string, any>> => (await getLocalStorage()).get(keys);
 
 export const loadAccount = async (): Promise<CacheNutAccount> => {
   const accountItems = await readSettings([ACCOUNT_ID, ACCOUNT_DEVICE_ID, ACCOUNT_TOKEN]);

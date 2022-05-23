@@ -115,8 +115,13 @@ export class CacheNutHttpClient {
       json.map(async (item) =>
         decryptPayload<ClipboardContent>(this.key, item.content).then(
           (payload) => {
-            const { deviceId, deviceName, createTs } = item;
-            return { deviceId, deviceName, createTs, content: payload };
+            const { deviceId, deviceName, createTs, expiresAt } = item;
+            const expireDate = expiresAt ? new Date(expiresAt) : undefined;
+            return {
+              deviceId, deviceName, createTs,
+              expiresAt: expireDate,
+              content: payload
+            };
           }
         )
       )
