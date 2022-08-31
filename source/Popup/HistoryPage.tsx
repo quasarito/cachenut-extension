@@ -40,6 +40,7 @@ import {
   CacheNutStyles,
   createTab,
   navigateTo,
+  sendMessage,
   slideDirection,
   SlideDirection,
   timeElapsed,
@@ -52,10 +53,12 @@ import {
   ClipboardItem,
   ClipboardTextContent,
   ClipboardUrlContent,
+  resetAccount,
 } from '../CacheNut/Model';
 import { Logger } from '../CacheNut/Support';
 import { createHttpClient } from '../CacheNut/HttpClient';
 import { CopyContentPage } from './CopyContentPage';
+import { UnregisteredPage } from './UnregisteredPage';
 
 const logger = Logger('HistoryPage');
 
@@ -108,6 +111,24 @@ export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryControl
       })
       .catch((err) => {
         logger.log('listError: ', err);
+        setClipsLoaded(true);
+        setClipboardItems([]);
+        if (err.status === 403) {
+          toast.prompt('Account not found.', ['Retry', 'Disconnect'])
+          .then((answer) => {
+            if (answer === 'Disconnect') {
+              resetAccount() // remove account info from local storage
+              .then(() => sendMessage({event: 'unlinked'}))
+              .then(() => navigateTo(<UnregisteredPage />));
+            }
+            else if (answer === 'Retry') {
+              setClipsLoaded(false);
+            }
+          });
+        }
+        else {
+          toast.error('An error occurred. Reload the page.');
+        }
       });
     }
   });

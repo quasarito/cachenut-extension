@@ -19,11 +19,13 @@ import {
 } from '@mui/material';
 import { ExpandMoreOutlined } from '@mui/icons-material';
 import * as React from 'react';
-import { parseCryptoKey } from '../CacheNut/Crypto';
+
+import { CacheNutStyles, createDeviceName, sendMessage, Toast, ToastComponent } from '../Popup/PageSupport';
+import { Config } from '../CacheNut/Config';
 import { createHttpClient, register } from '../CacheNut/HttpClient';
+import { parseCryptoKey } from '../CacheNut/Crypto';
 import { resetAccount, saveAccount, saveCryptoKey, storeSettings } from '../CacheNut/Model';
 // import {Logger} from '../CacheNut/Support';
-import { CacheNutStyles, createDeviceName, sendMessage, Toast, ToastComponent } from '../Popup/PageSupport';
 
 // const logger = Logger('OptionsIndex');
 
@@ -243,6 +245,9 @@ export const Options: React.FC = () => {
           </CardActions>
         </Collapse>
       </Card>
+      <Typography variant="caption" display="block" gutterBottom>
+        Endpoint: {Config.baseUrl}
+      </Typography>
     </Container>
     {ToastComponent(toast)}
   </>;
