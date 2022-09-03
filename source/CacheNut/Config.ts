@@ -1,4 +1,4 @@
 export const Config = {
-  baseUrl: 'http://localhost',
+  baseUrl: 'https://api.cachenut.com/api/dev',
   loggingEnabled: true,
 };

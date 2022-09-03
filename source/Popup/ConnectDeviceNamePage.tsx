@@ -18,6 +18,7 @@ import {
   CancelActivationButton,
   createDeviceName,
   navigateTo,
+  sendMessage,
   slideDirection,
   SlideDirection,
   Toast,
@@ -109,9 +110,9 @@ export const ConnectDeviceNamePage: React.FC<{slide?: SlideDirection;mock?: Conn
             .then(([account, err]) => {
               if (account) {
                 resetActivationData();
-                toast.success('Connected.').then(() => {
-                  navigateTo(<AccountPage />);
-                });
+                toast.success('Connected.')
+                .then(() => sendMessage({event: 'linked'}))
+                .then(() => navigateTo(<AccountPage />));
               }
               else if (err) {
                 toast.error(err);
