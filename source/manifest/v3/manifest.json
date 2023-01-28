@@ -11,7 +11,7 @@
     "96": "assets/icons/cachenut-acorn-96.png",
     "128": "assets/icons/cachenut-acorn-128.png"
   },
-  "description": "Clipboard across browsers",
+  "description": "A shared clipboard across browsers that is encrypted and anonymous.",
   "homepage_url": "https://cachenut.com",
   "short_name": "Cache Nut",
 

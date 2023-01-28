@@ -108,3 +108,9 @@ dist/
 !.yarn/releases
 !.yarn/plugins
 .pnp.*
+
+## Storybook
+/.storybook/
+stories/
+
+.vscode/settings.json
