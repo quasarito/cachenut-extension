@@ -14,7 +14,7 @@ import {
 import { createTheme } from '@mui/material/styles';
 import { Close } from '@mui/icons-material';
 import * as React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import UAParser from 'ua-parser-js';
 
 import { resetActivationData } from '../CacheNut/Model';
@@ -87,11 +87,11 @@ export const navigateTo = (page: React.ReactElement): void => {
   const rootElement = document.getElementById('popup-root')
     || document.getElementById('options-root')
     || document.getElementById('root');
-  ReactDOM.render(
+  const root = createRoot(rootElement);
+  root.render(
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={cacheNutTheme}>{page}</ThemeProvider>
-    </StyledEngineProvider>,
-    rootElement
+    </StyledEngineProvider>
   );
 };
 
