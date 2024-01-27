@@ -13,14 +13,23 @@ Edit the source file `Config.ts` and set the URL of the Cache Nut server:
 Pre-requisites:
 - nodejs v18
 - yarn 4
+
+Install nvm for nodejs:
 ```bash
-# install nvm for nodejs
-$ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-# after installation is complete, open a new terminal so nvm is available...
-$ nvm install 18
-$ nvm use 18
-# install yarn
-$ npm install -g yarn
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+``````
+
+After installation is complete, **open a new terminal** so nvm is available.
+```bash
+nvm install 18
+```
+```bash
+nvm use 18
+```
+
+Enable `yarn`:
+```bash
+corepack enable
 ```
 
 Required by third-party library `node-sass` for build:
@@ -28,22 +37,22 @@ Required by third-party library `node-sass` for build:
 - make
 ```bash
 # on Debian-based systems
-$ sudo apt install python3 build-essential
+sudo apt install python3 build-essential
 ```
 
 Clone cachenut project:
 ```bash
-$ git clone https://github.com/quasarito/cachenut-extension.git
+git clone https://github.com/quasarito/cachenut-extension.git
 ```
 
 Install dependencies:
 ```bash
-$ yarn install
+yarn install
 ```
 
 Build extension for Chrome, Firefox, Opera:
 ```bash
-$ yarn build
+yarn build
 ```
 Build artifacts will be created in `extension` folder.
 
