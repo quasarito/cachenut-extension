@@ -5,12 +5,11 @@ import {
   Button,
   Container,
   CssBaseline,
-  IconButton,
   Slide,
   Toolbar,
   Typography,
 } from '@mui/material';
-import {ArrowBackOutlined, DoneOutlineOutlined} from '@mui/icons-material';
+import { DoneOutlineOutlined } from '@mui/icons-material';
 
 import {
   CacheNutStyles,
@@ -20,20 +19,11 @@ import {
 } from './PageSupport';
 import { AccountPage } from './AccountPage';
 import { resetActivationData } from '../CacheNut/Model';
-import { AddDeviceLinkCodePage } from './AddDeviceLinkCodePage';
 
 export const AddDeviceCompletedPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
   return <>
     <AppBar position="static">
       <Toolbar variant="dense">
-        <IconButton
-          edge="start"
-          color="inherit"
-          aria-label="menu"
-          onClick={(): void => navigateTo(<AddDeviceLinkCodePage slide="back" />)}
-          size="large">
-          <ArrowBackOutlined />
-        </IconButton>
         <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
           Finish
         </Typography>

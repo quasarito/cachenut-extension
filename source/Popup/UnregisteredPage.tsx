@@ -29,7 +29,7 @@ export const UnregisteredPage: React.FC<{slide?: SlideDirection}> = ({slide}) =>
           sx={ CacheNutStyles.submit }
           onClick={(): void => navigateTo(<NewAccountPage />)}
         >
-          Create a new account
+          Register this device
         </Button>
         <Button
           variant="contained"
@@ -37,7 +37,7 @@ export const UnregisteredPage: React.FC<{slide?: SlideDirection}> = ({slide}) =>
           sx={ CacheNutStyles.submit }
           onClick={(): void => navigateTo(<ConnectAccessCodePage />)}
         >
-          Connect to an account
+          Connect to another device
         </Button>
       </Container>
     </Slide>

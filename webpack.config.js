@@ -127,6 +127,9 @@ module.exports = {
   },
 
   plugins: [
+    new webpack.DefinePlugin({
+      BUILT_AT: JSON.stringify(new Date().toISOString().slice(0,-5).replaceAll(/[-:\.TZ]/g,''))
+    }),
     // Plugin to not generate js bundle for manifest entry
     new WextManifestWebpackPlugin(),
     // Generate sourcemaps

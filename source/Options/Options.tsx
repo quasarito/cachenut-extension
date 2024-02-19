@@ -19,15 +19,15 @@ import {
 } from '@mui/material';
 import { ExpandMoreOutlined } from '@mui/icons-material';
 import * as React from 'react';
+import browser from 'webextension-polyfill';
 
 import { CacheNutStyles, createDeviceName, sendMessage, Toast, ToastComponent } from '../Popup/PageSupport';
 import { Config } from '../CacheNut/Config';
 import { createHttpClient, register } from '../CacheNut/HttpClient';
 import { parseCryptoKey } from '../CacheNut/Crypto';
 import { resetAccount, saveAccount, saveCryptoKey, storeSettings } from '../CacheNut/Model';
-// import {Logger} from '../CacheNut/Support';
 
-// const logger = Logger('OptionsIndex');
+declare var BUILT_AT: string;
 
 const OptionsStyles = {
   paper: {
@@ -247,6 +247,9 @@ export const Options: React.FC = () => {
       </Card>
       <Typography variant="caption" display="block" gutterBottom>
         Endpoint: {Config.baseUrl}
+      </Typography>
+      <Typography variant="caption" display="block" gutterBottom>
+        Build: {browser.runtime.getManifest().version}-{BUILT_AT}
       </Typography>
     </Container>
     {ToastComponent(toast)}

@@ -22,6 +22,7 @@ import {
   stripNonAlphanumeric,
   Toast,
   ToastComponent,
+  validatingTextField,
 } from './PageSupport';
 import { UnregisteredPage } from './UnregisteredPage';
 import { ConnectLinkCodePage } from './ConnectLinkCodePage';
@@ -41,11 +42,11 @@ const logger = Logger('ConnectAccessCodePage');
 function createConnectAccessCodeController(): ConnectAccessCodeController {
   return {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    connectClicked: async (accessCodeField: any): Promise<boolean> => {
+    connectClicked: async (accessCode: string): Promise<boolean> => {
       const c = crypto.subtle;
 
       try {
-        const accessCode = stripNonAlphanumeric(accessCodeField.value.trim().toUpperCase());
+        accessCode = stripNonAlphanumeric(accessCode.trim().toUpperCase());
         logger.log(`accessCode=${accessCode}`);
         // Generate an EC key pair to create a shared key
         const keyPair = await createKeyPair();
@@ -90,7 +91,7 @@ function createConnectAccessCodeController(): ConnectAccessCodeController {
 export const ConnectAccessCodePage: React.FC<{slide?: SlideDirection;mock?: ConnectAccessCodeController;}> =
   ({mock, slide}) =>
 {
-  const accessCodeField = React.useRef();
+  const accessCode = validatingTextField(true);
   const toast: Toast = {} as Toast;
   const controller = mock || createConnectAccessCodeController();
 
@@ -115,19 +116,24 @@ export const ConnectAccessCodePage: React.FC<{slide?: SlideDirection;mock?: Conn
       <Container sx={ CacheNutStyles.paper }>
         <VpnKeyOutlined fontSize="large" />
         Enter the access code displayed on the active device.
-        <TextField fullWidth label="Access code" inputRef={accessCodeField} />
+        <TextField fullWidth
+          label="Access code"
+          inputRef={accessCode.inputRef}
+          {...accessCode.textFieldProps}
+        />
         <Button
           variant="contained"
           color="primary"
           sx={ CacheNutStyles.submit }
+          disabled={accessCode.disableInput}
           onClick={(): void => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const accessCodeInput = accessCodeField.current as any;
-            if (!accessCodeInput || !accessCodeInput.value.trim()) {
+            const accessCodeValue = accessCode?.value as any;
+            if (!accessCodeValue || !accessCodeValue.trim()) {
               toast.error('Please provide an access code.');
               return;
             }
-            controller.connectClicked(accessCodeField.current)
+            controller.connectClicked(accessCodeValue)
             .then((payloadHash) => {
               if (payloadHash) {
                 navigateTo(<ConnectLinkCodePage slide="next" />);

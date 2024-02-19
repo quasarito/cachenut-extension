@@ -16,6 +16,7 @@ import {
   stripNonAlphanumeric,
   Toast,
   ToastComponent,
+  validatingTextField
 } from './PageSupport';
 import { ActivationData, loadAccount, loadActivationData, loadCryptoKey, saveActivationData } from '../CacheNut/Model';
 import { AccountAuth, fetchLinkKey, postAccountAuth } from '../CacheNut/HttpClient';
@@ -44,7 +45,7 @@ async function linkKey(activation: ActivationData): Promise<boolean> {
     activation.step = 'LinkCode';
     return await saveActivationData(activation);
   } catch (err) {
-    console.log('linkKeyError', err);
+    logger.log('linkKeyError', err);
     return false;
   }
 }
@@ -62,8 +63,7 @@ function createAddDeviceLinkCodeController(): AddDeviceLinkCodeController {
       return '!';
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    validateLinkCode: async (linkCodeInput: any): Promise<boolean> => {
-      const linkCode = linkCodeInput.value;
+    validateLinkCode: async (linkCode: string): Promise<boolean> => {
       if (!linkCode) {
         return false;
       }
@@ -115,18 +115,16 @@ function createAddDeviceLinkCodeController(): AddDeviceLinkCodeController {
 export const AddDeviceLinkCodePage: React.FC<{slide?: SlideDirection; mock?: AddDeviceLinkCodeController;}> =
   ({mock, slide}) =>
 {
-  const linkCodeField = React.useRef();
-  const [linkCode, setLinkCode] = React.useState('');
+  const linkCode = validatingTextField(true);
   const [ authorizing, setAuthorizing ] = React.useState(false);
   const controller = mock || createAddDeviceLinkCodeController();
   const toast: Toast = {} as Toast;
 
   React.useEffect(() => {
-    if (!linkCode) {
+    if (!linkCode.value) {
       controller.computeLinkCode().then((code) => {
-        setLinkCode(code);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (linkCodeField.current as any).value = `${formatCode(code)}-`;
+        linkCode.setValue(code);
+        linkCode.inputRef.current.value = `${formatCode(code)}-`;
       });
     }
   });
@@ -146,15 +144,16 @@ export const AddDeviceLinkCodePage: React.FC<{slide?: SlideDirection; mock?: Add
         <Container sx={ CacheNutStyles.paper }>
           <LinkOutlined fontSize="large" />
           Complete the link code displayed by the new device.
-          <TextField fullWidth label="Link code" inputRef={linkCodeField} />
+          <TextField fullWidth label="Link code" {...linkCode.textFieldProps} />
           <LoadingButton
             variant="contained"
             color="primary"
             sx={ CacheNutStyles.submit }
             loading={authorizing}
+            disabled={linkCode.disableInput}
             onClick={(): void => {
               setAuthorizing(true);
-              controller.validateLinkCode(linkCodeField.current)
+              controller.validateLinkCode(linkCode.value)
               .then((validated) => {
                 if (validated) {
                   navigateTo(<AddDeviceCompletedPage slide="next" />);

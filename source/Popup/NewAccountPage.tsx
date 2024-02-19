@@ -22,6 +22,7 @@ import {
   SlideDirection,
   Toast,
   ToastComponent,
+  validatingTextField,
 } from './PageSupport';
 import { register } from '../CacheNut/HttpClient';
 import { AccountPage } from './AccountPage';
@@ -51,11 +52,11 @@ function createNewAccountPageController(): NewAccountPageController {
 }
 
 export const NewAccountPage: React.FC<{slide?: SlideDirection; mock?: NewAccountPageController;}> = ({mock, slide}) => {
-  const deviceNameField = React.useRef();
+  const deviceName = validatingTextField(true, createDeviceName());
   const toast: Toast = {} as Toast;
   const controller = mock || createNewAccountPageController();
   const defaultName = createDeviceName();
-  const [ registering, setRegistering ] = React.useState(false);
+  const [ registering, setRegistering ] = React.useState(0); // 0=unregistered, 1=registering, -1=registered
 
   return <>
     <AppBar position="static">
@@ -64,6 +65,7 @@ export const NewAccountPage: React.FC<{slide?: SlideDirection; mock?: NewAccount
           edge="start"
           color="inherit"
           aria-label="menu"
+          disabled={registering != 0}
           onClick={(): void => navigateTo(<UnregisteredPage slide="done" />)}
           size="large">
           <ArrowBackOutlined />
@@ -78,29 +80,36 @@ export const NewAccountPage: React.FC<{slide?: SlideDirection; mock?: NewAccount
       <Container sx={ CacheNutStyles.paper }>
         <PostAddOutlined fontSize="large" />
         Create a new account for this device.
-        <TextField fullWidth label="Device name" defaultValue={defaultName} inputRef={deviceNameField} />
+        <TextField fullWidth
+          label="Device name"
+          disabled={registering != 0}
+          {...deviceName.textFieldProps}
+        />
         <LoadingButton
           variant="contained"
           color="primary"
           sx={ CacheNutStyles.submit }
-          loading={registering}
+          loading={registering == 1}
+          disabled={ registering == -1 || deviceName.disableInput }
           onClick={() => {
-            setRegistering(true);
-            controller.createAccount(deviceNameField.current)
+            setRegistering(1);
+            controller.createAccount(deviceName.value)
             .then(([account, err]) => {
               if (account) {
-                toast.success('Account created.').then(() => {
+                setRegistering(-1);
+                toast.success('Account created.')
+                .then(() => {
                   navigateTo(<AccountPage slide="done" />);
                 });
               }
               else if (err) {
-                toast.error(err);
-                setRegistering(false);
+                toast.error(err)
+                .then(() => setRegistering(0));
               }
             })
             .catch(() => {
-              toast.error('Unable to save account. Try again.');
-              setRegistering(false);
+              toast.error('Unable to save account. Try again.')
+              .then(() => setRegistering(0));
             })
           }}
         >

@@ -47,7 +47,7 @@ function addNewDeviceClicked(): void {
 export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageController;}> = ({mock, slide}) => {
   const [ account, setAccount ] = React.useState({} as CacheNutAccount);
   const [ deviceList, setDeviceList ] = React.useState([] as Device[]);
-  const [ disconnecting, setDisconnecting ] = React.useState(false);
+  const [ disconnecting, setDisconnecting ] = React.useState(0); // 0=connected, 1=disconnecting, -1=disconnected
   const toast: Toast = {} as Toast;
   const controller = mock || createAccountPageController();
 
@@ -73,6 +73,7 @@ export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageCo
           edge="start"
           color="inherit"
           aria-label="menu"
+          disabled={disconnecting != 0}
           onClick={(): void => navigateTo(<HistoryPage slide="back" />)}
           size="large">
           <ArrowBackOutlined />
@@ -92,7 +93,7 @@ export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageCo
           variant="outlined"
           color="primary"
           sx={ CacheNutStyles.submit }
-          disabled={disconnecting}
+          disabled={disconnecting != 0}
           onClick={(): void => navigateTo(<ManageDevicesPage slide="next" />)}
         >
           Manage devices
@@ -101,7 +102,7 @@ export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageCo
           variant="contained"
           color="primary"
           sx={ CacheNutStyles.submit }
-          disabled={disconnecting}
+          disabled={disconnecting != 0}
           onClick={addNewDeviceClicked}
         >
           Add a new device
@@ -110,16 +111,18 @@ export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageCo
           variant="outlined"
           color="primary"
           sx={ CacheNutStyles.submit }
-          loading={disconnecting}
+          loading={disconnecting == 1}
+          disabled={disconnecting != 0}
           onClick={(): void => {
-            setDisconnecting(true);
+            setDisconnecting(1);
             controller
               .disconnect()
+              .then(() => setDisconnecting(-1))
               .then(async () => toast.message('Disconnected.'))
               .then(() => navigateTo(<UnregisteredPage />))
               .catch(async () => {
-                toast.error('An error occurred. Try again.');
-                setDisconnecting(false);
+                await toast.error('An error occurred. Try again.');
+                setDisconnecting(0);
               });
           }}
         >

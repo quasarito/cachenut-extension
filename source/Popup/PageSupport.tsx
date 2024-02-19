@@ -12,7 +12,7 @@ import {
   StyledEngineProvider,
 } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
-import { Close } from '@mui/icons-material';
+import { Close, PsychologyRounded } from '@mui/icons-material';
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import UAParser from 'ua-parser-js';
@@ -83,12 +83,25 @@ export const slideDirection = (direction: SlideDirection | undefined): 'left' | 
   }
 };
 
-export const navigateTo = (page: React.ReactElement): void => {
-  const rootElement = document.getElementById('popup-root')
+const findRoot = () => {
+  let rootElement = document.getElementById('popup-root')
     || document.getElementById('options-root')
     || document.getElementById('root');
-  const root = createRoot(rootElement);
-  root.render(
+  if (!rootElement) {
+    // may be loaded in storybook
+    rootElement = document.getElementById('storybook-root')
+      || document.querySelector('div[id^="story--example"][id$="page--primary-inner"]');
+  }
+
+  return rootElement == appRootElement
+    ? [ appRoot, appRootElement ]
+    : [ createRoot(rootElement), rootElement ];
+};
+
+const [ appRoot, appRootElement ] = findRoot();
+export const navigateTo = (page: React.ReactElement): void => {
+  // toast?.close();
+  appRoot.render(
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={cacheNutTheme}>{page}</ThemeProvider>
     </StyledEngineProvider>
@@ -175,6 +188,7 @@ export interface Toast {
   success: (message: string) => Promise<void>;
   warning: (message: string) => Promise<void>;
   prompt: (message: string, answers: string[]) => Promise<string>;
+  // close: () => void;
 }
 
 export const ToastComponent = (
@@ -191,10 +205,10 @@ export const ToastComponent = (
   const [exitCallbacks, setExitCallbacks] = React.useState([] as Array<() => void>);
   const handleClose = (): void => { setToastState({...toastState, open: false}); };
   const handleExited = (): void => {
-    exitCallbacks.forEach((exitCb) => exitCb());
+    exitCallbacks.forEach(exitCb => exitCb());
     setExitCallbacks([]);
   };
-  const clickClose = (): void => {
+  const closeToast = (): void => {
     handleClose();
     handleExited();
   };
@@ -206,7 +220,7 @@ export const ToastComponent = (
           size="small"
           aria-label="close"
           color="inherit"
-          onClick={clickClose}
+          onClick={closeToast}
         >
           <Close fontSize="small" />
         </IconButton>
@@ -216,7 +230,7 @@ export const ToastComponent = (
   const [snackbarContent, setSnackbarContent] = React.useState(<></>);
   const alert = (sev: 'success' | 'info' | 'warning' | 'error') => async (message: string): Promise<void> => {
     setSnackbarContent(
-      <Alert variant="filled" severity={sev} onClose={clickClose}>
+      <Alert variant="filled" severity={sev} onClose={closeToast}>
         {message}
       </Alert>
     );
@@ -272,7 +286,11 @@ export const ToastComponent = (
       TransitionComponent={toastState.transition}
       key={toastState.message}
       autoHideDuration={5000}
-      onClose={clickClose}
+      // onClose={(event, reason) => {
+      //   if (reason != 'timeout') {
+      //     closeToast();
+      //   }
+      // }}
     >
       {snackbarContent}
     </Snackbar>
@@ -302,6 +320,25 @@ export class PageError extends Error {
     super();
   }
 };
+
+export const validatingTextField = (disableError: boolean = false, defaultValue?: string) => {
+  const fieldRef = React.useRef<any>();
+  const [ fieldValue, setFieldValue ] = React.useState(
+    fieldRef.current ? fieldRef.current.value : (defaultValue || ''));
+
+  return {
+    inputRef: fieldRef,
+    setValue: setFieldValue,
+    value: fieldValue as string,
+    disableInput: !fieldRef.current ? !defaultValue : fieldRef.current.value.trim().length === 0,
+    textFieldProps: {
+      defaultValue,
+      error: disableError ? false : fieldValue.trim().length === 0,
+      inputRef: fieldRef,
+      onChange: evt => setFieldValue(evt.target.value),
+    }
+  };
+}
 
 // Note: webextension-polyfill is lazy-imported to avoid errors in Storybook
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

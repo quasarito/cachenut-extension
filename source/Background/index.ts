@@ -127,7 +127,7 @@ browser.contextMenus.onClicked.addListener((info) => {
   pasteClicked(info);
 });
 
-function handleMessage(message: any): Promise<any> | undefined {
+function handleMessage(message: any): Promise<any> {
   if (message.event === 'linked') {
     logger.log('handleMessage: linked');
     return browser.contextMenus.removeAll()
@@ -148,7 +148,7 @@ function handleMessage(message: any): Promise<any> | undefined {
       return false;
     });
   }
-  return undefined;
+  return Promise.resolve();
 }
 
 browser.runtime.onMessage.addListener(handleMessage);

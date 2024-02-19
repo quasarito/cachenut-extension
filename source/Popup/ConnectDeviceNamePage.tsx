@@ -5,13 +5,12 @@ import {
   Button,
   Container,
   CssBaseline,
-  IconButton,
   Slide,
   TextField,
   Toolbar,
   Typography,
 } from '@mui/material';
-import { ArrowBackOutlined, DoneOutlineOutlined } from '@mui/icons-material';
+import { DoneOutlineOutlined } from '@mui/icons-material';
 
 import {
   CacheNutStyles,
@@ -23,6 +22,7 @@ import {
   SlideDirection,
   Toast,
   ToastComponent,
+  validatingTextField,
 } from './PageSupport';
 import { AccountPage } from './AccountPage';
 import { getAccountAuth, register } from '../CacheNut/HttpClient';
@@ -33,13 +33,11 @@ import {
   saveAccount,
   saveCryptoKey,
 } from '../CacheNut/Model';
-import { ConnectLinkCodePage } from './ConnectLinkCodePage';
 
 function createConnectDeviceNameController(): ConnectDeviceNameController {
   return {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    registerAsDevice: async (deviceNameField: any): Promise<[CacheNutAccount, null] | [null, string]> => {
-      const deviceName = deviceNameField.value;
+    registerAsDevice: async (deviceName: string): Promise<[CacheNutAccount, null] | [null, string]> => {
       const c = crypto.subtle;
       const activation = await loadActivationData();
       if (activation?.sharedKey) {
@@ -67,27 +65,18 @@ function createConnectDeviceNameController(): ConnectDeviceNameController {
 export const ConnectDeviceNamePage: React.FC<{slide?: SlideDirection;mock?: ConnectDeviceNameController;}> =
   ({mock, slide}) =>
 {
-  const deviceNameField = React.useRef();
+  const deviceName = validatingTextField(true, createDeviceName());
+  const [ done, setDone ] = React.useState(false);
   const toast: Toast = {} as Toast;
-  const defaultName = createDeviceName();
   const controller = mock || createConnectDeviceNameController();
 
   return <>
     <AppBar position="static">
       <Toolbar variant="dense">
-        <IconButton
-          edge="start"
-          color="inherit"
-          aria-label="menu"
-          onClick={(): void =>navigateTo(<ConnectLinkCodePage slide="back" />)}
-          size="large">
-          <ArrowBackOutlined />
-        </IconButton>
         <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
           Finish
         </Typography>
-        <CancelActivationButton message="Quit account connection?" toast={toast}
-        />
+        <CancelActivationButton message="Quit account connection?" toast={toast} />
       </Toolbar>
     </AppBar>
     <CssBaseline />
@@ -98,15 +87,16 @@ export const ConnectDeviceNamePage: React.FC<{slide?: SlideDirection;mock?: Conn
         <TextField
           fullWidth
           label="Name to identify this device"
-          defaultValue={defaultName}
-          inputRef={deviceNameField}
+          {...deviceName.textFieldProps}
         />
         <Button
           variant="contained"
           color="primary"
           sx={ CacheNutStyles.submit }
+          disabled={done || deviceName.disableInput}
           onClick={(): void => {
-            controller.registerAsDevice(deviceNameField.current)
+            setDone(true);
+            controller.registerAsDevice(deviceName.value)
             .then(([account, err]) => {
               if (account) {
                 resetActivationData();
@@ -115,6 +105,7 @@ export const ConnectDeviceNamePage: React.FC<{slide?: SlideDirection;mock?: Conn
                 .then(() => navigateTo(<AccountPage />));
               }
               else if (err) {
+                setDone(false);
                 toast.error(err);
               }
             })

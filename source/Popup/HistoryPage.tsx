@@ -72,7 +72,7 @@ function ellipsis(text: string): string {
 }
 
 function ellipsisTooltip(text: string): string | JSX.Element {
-  if (text.length > ELLIPSIS_LENGTH) {
+  if (text?.length > ELLIPSIS_LENGTH) {
     return (
       <Tooltip title={text}>
         <span>{ellipsis(text)}</span>
@@ -246,22 +246,34 @@ export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryControl
         createHttpClient()
         .then(async (client) => {
           const tabs = await activeTab();
-          if (tabs.length > 0) {
+          if (tabs.length > 0 && tabs[0].url) {
             await client.cache({
               type: 'url',
               url: tabs[0].url,
             } as ClipboardContent);
+            setClipsLoaded(false);
             await toast.success('Tab location copied to Cache Nut.');
+          }
+          else {
+            await toast.warning('Unable to copy tab location.');
           }
         });
       }}>
         <ListItemText primary="Copy tab location" />
       </ListItemButton>
-      <ListItemButton onClick={(): void => navigateTo(<CopyContentPage slide="next" />)}>
+      <ListItemButton onClick={
+        (): void => {
+          openMenu(false);
+          navigateTo(<CopyContentPage slide="next" />);
+        }}>
         <ListItemText primary="Copy clipboard content" />
       </ListItemButton>
       <Divider />
-      <ListItemButton onClick={(): void => navigateTo(<AccountPage slide="next" />)}>
+      <ListItemButton onClick={
+        (): void => {
+          openMenu(false);
+          navigateTo(<AccountPage slide="next" />);
+        }}>
         <ListItemText primary="Account" />
       </ListItemButton>
     </List>
