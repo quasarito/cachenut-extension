@@ -111,6 +111,7 @@ dist/
 
 ## Storybook
 /.storybook/
-stories/
+/storybook-static/
+# stories/
 
 .vscode/settings.json
