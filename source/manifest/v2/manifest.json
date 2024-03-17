@@ -1,6 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Cache Nut",
+  "author": "Huy Duong",
   "version": "0.1.0",
 
   "icons": {
@@ -25,8 +26,6 @@
   ],
 
   "content_security_policy": "script-src 'self'; object-src 'self'",
-
-  "author": "Huy Duong",
 
   "__firefox__applications": {
     "gecko": {

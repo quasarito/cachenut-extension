@@ -29,6 +29,12 @@
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
 
+  "__firefox__browser_specific_settings": {
+    "gecko": {
+      "id": "extension@cachenut.com"
+    }
+  },
+
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -47,6 +53,9 @@
   },
 
   "background": {
-    "service_worker": "js/background.bundle.js"
+    "service_worker": "js/background.bundle.js",
+    "__firefox__scripts": [
+      "js/background.bundle.js"
+    ]
   }
 }
