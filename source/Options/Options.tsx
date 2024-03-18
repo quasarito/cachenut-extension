@@ -249,7 +249,7 @@ export const Options: React.FC = () => {
         Endpoint: {Config.baseUrl}
       </Typography>
       <Typography variant="caption" display="block" gutterBottom>
-        Build: {browser.runtime.getManifest().version}-{BUILT_AT}
+        Build: {browser.runtime.getManifest().version}:{BUILT_AT}
       </Typography>
     </Container>
     {ToastComponent(toast)}

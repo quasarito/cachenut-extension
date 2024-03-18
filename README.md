@@ -45,7 +45,7 @@ Clone cachenut project:
 git clone https://github.com/quasarito/cachenut-extension.git
 ```
 
-Checkout build version branch. Use `main` branch for the ßlatest development build.
+Checkout build version branch. Use `main` branch for the latest development build.
 ```bash
 git checkout v1
 ```
