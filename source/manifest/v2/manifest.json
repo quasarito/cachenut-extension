@@ -2,7 +2,6 @@
   "manifest_version": 2,
   "name": "Cache Nut",
   "author": "Huy Duong",
-  "version": "0.1.0",
 
   "icons": {
     "16": "assets/icons/cachenut-acorn-16.png",

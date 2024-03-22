@@ -1,11 +1,11 @@
 {
   "name": "cachenut",
-  "version": "0.1.0",
+  "version": "1.0.2",
   "description": "Clipboard across browsers",
   "private": true,
   "author": {
     "name": "cachenut",
-    "email": "noreply@cachenut.com",
+    "email": "extension@cachenut.com",
     "url": "https://cachenut.com"
   },
   "license": "MIT",

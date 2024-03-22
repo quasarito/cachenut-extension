@@ -2,7 +2,6 @@
   "manifest_version": 3,
   "name": "Cache Nut",
   "author": "Huy Duong",
-  "version": "0.1.0",
 
   "icons": {
     "16": "assets/icons/cachenut-acorn-16.png",
@@ -31,9 +30,11 @@
 
   "__firefox__browser_specific_settings": {
     "gecko": {
-      "id": "extension@cachenut.com"
+      "id": "extension@cachenut.com",
+      "strict_min_version": "123.0"
     }
   },
+  "__chrome__minimum_chrome_version": "122",
 
   "action": {
     "default_popup": "popup.html",
