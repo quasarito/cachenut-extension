@@ -1,11 +1,11 @@
 {
   "name": "cachenut",
-  "version": "0.1.0",
+  "version": "1.0.2.2",
   "description": "Clipboard across browsers",
   "private": true,
   "author": {
     "name": "cachenut",
-    "email": "noreply@cachenut.com",
+    "email": "extension@cachenut.com",
     "url": "https://cachenut.com"
   },
   "license": "MIT",
@@ -14,13 +14,14 @@
     "yarn": ">=4.0.2"
   },
   "scripts": {
-    "dev:chrome": "cross-env NODE_ENV=development cross-env TARGET_BROWSER=chrome webpack --watch",
-    "dev:firefox": "cross-env NODE_ENV=development cross-env TARGET_BROWSER=firefox webpack --watch",
-    "dev:opera": "cross-env NODE_ENV=development cross-env TARGET_BROWSER=opera webpack --watch",
-    "build:chrome": "cross-env NODE_ENV=production cross-env TARGET_BROWSER=chrome webpack",
-    "build:firefox": "cross-env NODE_ENV=production cross-env TARGET_BROWSER=firefox webpack",
-    "build:opera": "cross-env NODE_ENV=production cross-env TARGET_BROWSER=opera webpack",
-    "build": "yarn run build:chrome && yarn run build:firefox && yarn run build:opera",
+    "dev:chrome": "cross-env NODE_ENV=development TARGET_BROWSER=chrome webpack --watch",
+    "dev:firefox": "cross-env NODE_ENV=development TARGET_BROWSER=firefox webpack --watch",
+    "dev:opera": "cross-env NODE_ENV=development TARGET_BROWSER=opera webpack --watch",
+    "build:chrome": "cross-env TARGET_BROWSER=chrome webpack",
+    "build:firefox": "cross-env TARGET_BROWSER=firefox webpack",
+    "build:opera": "cross-env TARGET_BROWSER=opera webpack",
+    "dev:build": "cross-env-shell NODE_ENV=development BUILD_ONLY=true \"yarn run build:chrome && yarn run build:firefox && yarn run build:opera\"",
+    "build": "cross-env-shell NODE_ENV=production \"yarn run build:chrome && yarn run build:firefox && yarn run build:opera\"",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "storybook": "storybook dev -p 6006",

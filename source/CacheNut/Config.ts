@@ -1,4 +1,6 @@
+declare var IS_DEV_BUILD: boolean;
+
 export const Config = {
   baseUrl: 'https://api.cachenut.com/api/dev',
-  loggingEnabled: true,
+  loggingEnabled: IS_DEV_BUILD,
 };

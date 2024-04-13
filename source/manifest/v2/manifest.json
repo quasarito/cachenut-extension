@@ -2,7 +2,6 @@
   "manifest_version": 2,
   "name": "Cache Nut",
   "author": "Huy Duong",
-  "version": "0.1.0",
 
   "icons": {
     "16": "assets/icons/cachenut-acorn-16.png",
@@ -15,7 +14,21 @@
   "homepage_url": "https://cachenut.com",
   "short_name": "Cache Nut",
 
-  "permissions": [
+  "__chrome__permissions": [
+    "activeTab",
+    "clipboardRead",
+    "clipboardWrite",
+    "contextMenus",
+    "storage"
+  ],
+  "__opera__permissions": [
+    "activeTab",
+    "clipboardRead",
+    "clipboardWrite",
+    "contextMenus",
+    "storage"
+  ],
+  "__firefox__permissions": [
     "activeTab",
     "bookmarks",
     "clipboardRead",
