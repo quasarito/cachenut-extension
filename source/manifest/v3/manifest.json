@@ -14,7 +14,21 @@
   "homepage_url": "https://cachenut.com",
   "short_name": "Cache Nut",
 
-  "permissions": [
+  "__chrome__permissions": [
+    "activeTab",
+    "clipboardRead",
+    "clipboardWrite",
+    "contextMenus",
+    "storage"
+  ],
+  "__opera__permissions": [
+    "activeTab",
+    "clipboardRead",
+    "clipboardWrite",
+    "contextMenus",
+    "storage"
+  ],
+  "__firefox__permissions": [
     "activeTab",
     "bookmarks",
     "clipboardRead",
@@ -54,7 +68,8 @@
   },
 
   "background": {
-    "service_worker": "js/background.bundle.js",
+    "__chrome__service_worker": "js/background.bundle.js",
+    "__opera__service_worker": "js/background.bundle.js",
     "__firefox__scripts": [
       "js/background.bundle.js"
     ]

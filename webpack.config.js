@@ -15,10 +15,11 @@ const viewsPath = path.join(__dirname, 'views');
 const sourcePath = path.join(__dirname, 'source');
 const destPath = path.join(__dirname, 'extension');
 const nodeEnv = process.env.NODE_ENV || 'development';
+const buildOnly = process.env.BUILD_ONLY === 'true';
 const targetBrowser = process.env.TARGET_BROWSER;
 
 const extensionReloaderPlugin =
-  nodeEnv === 'development'
+  nodeEnv === 'development' && !buildOnly
     ? new ExtensionReloader({
         port: 9090,
         reloadPage: true,
@@ -128,7 +129,8 @@ module.exports = {
 
   plugins: [
     new webpack.DefinePlugin({
-      BUILT_AT: nodeEnv == 'production'
+      IS_DEV_BUILD: nodeEnv === 'development',
+      BUILT_AT: nodeEnv === 'production'
         ? JSON.stringify(new Date().getFullYear())
         : JSON.stringify(new Date().toISOString().slice(0,-5).replaceAll(/[-:\.TZ]/g,''))
     }),
