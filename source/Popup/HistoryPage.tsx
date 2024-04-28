@@ -144,7 +144,7 @@ export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryControl
     }
   };
 
-  const elapsedOrExpiredDuration = (ts: number | Date, expires: number | Date | undefined): string => {
+  const elapsedOrExpiredDuration = (ts: number | Date, expires?: number | Date): string => {
     const SECONDS_TO_EXPIRED = 5;
     const expiresDate = new Date(expires || 0);
     const remaining = expiresDate.getTime() - Date.now();
@@ -156,7 +156,7 @@ export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryControl
     return `Added ${timeElapsed(ts)} ago`;
   };
 
-  const CardUrl: React.FC<{url: string; ts: number | Date; expires: number | Date | undefined;}> =
+  const CardUrl: React.FC<{url: string; ts: number | Date; expires?: number | Date;}> =
   ({url, ts, expires}) => (
     <Card variant="outlined">
       <CardHeader
@@ -183,7 +183,7 @@ export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryControl
     </Card>
   );
 
-  const CardImage: React.FC<{url: string; ts: number | Date; expires: number | Date | undefined;}> =
+  const CardImage: React.FC<{url: string; ts: number | Date; expires: number | Date;}> =
   ({url, ts, expires}) => (
     <Card variant="outlined">
       <CardHeader
@@ -201,7 +201,7 @@ export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryControl
     </Card>
   );
 
-  const CardText: React.FC<{text: string; ts: number | Date; expires: number | Date | undefined;}> =
+  const CardText: React.FC<{text: string; ts: number | Date; expires?: number | Date;}> =
   ({text, ts, expires}) => {
     const [expanded, setExpanded] = React.useState(false);
     const handleExpandClick = (): void => {
@@ -282,12 +282,13 @@ export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryControl
   let gridListItems: React.ReactNode;
   if (isClipsLoaded) {
     if (clipItems.length > 0) {
-      gridListItems = clipItems.map((item) => {
+      gridListItems = clipItems.sort((a, b) => b.createTs - a.createTs) // reverse chronological order
+      .map((item) => {
         switch (item.content.type) {
           case 'image': {
             const imageItem = item.content as ClipboardUrlContent;
             return (
-              <ImageListItem style={{height: 'auto'}}>
+              <ImageListItem key={item.createTs} style={{height: 'auto'}}>
                 <CardImage url={imageItem.url} ts={item.createTs} expires={item.expiresAt} />
               </ImageListItem>
             );
@@ -295,7 +296,7 @@ export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryControl
           case 'url': {
             const urlItem = item.content as ClipboardUrlContent;
             return (
-              <ImageListItem style={{height: 'auto'}}>
+              <ImageListItem key={item.createTs} style={{height: 'auto'}}>
                 <CardUrl url={urlItem.url} ts={item.createTs} expires={item.expiresAt} />
               </ImageListItem>
             );
@@ -304,7 +305,7 @@ export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryControl
           default: {
             const textItem = item.content as ClipboardTextContent;
             return (
-              <ImageListItem style={{height: 'auto'}}>
+              <ImageListItem key={item.createTs} style={{height: 'auto'}}>
                 <CardText text={textItem.text} ts={item.createTs} expires={item.expiresAt} />
               </ImageListItem>
             );

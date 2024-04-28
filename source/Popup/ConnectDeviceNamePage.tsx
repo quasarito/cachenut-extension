@@ -76,7 +76,7 @@ export const ConnectDeviceNamePage: React.FC<{slide?: SlideDirection;mock?: Conn
         <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
           Finish
         </Typography>
-        <CancelActivationButton message="Quit account connection?" toast={toast} />
+        <CancelActivationButton message="Quit account connection?" toast={toast} disabled={done} />
       </Toolbar>
     </AppBar>
     <CssBaseline />

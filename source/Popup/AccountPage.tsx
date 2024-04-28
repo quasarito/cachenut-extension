@@ -73,7 +73,7 @@ export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageCo
           edge="start"
           color="inherit"
           aria-label="menu"
-          disabled={disconnecting != 0}
+          disabled={disconnecting !== 0}
           onClick={(): void => navigateTo(<HistoryPage slide="back" />)}
           size="large">
           <ArrowBackOutlined />
@@ -93,7 +93,7 @@ export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageCo
           variant="outlined"
           color="primary"
           sx={ CacheNutStyles.submit }
-          disabled={disconnecting != 0}
+          disabled={disconnecting !== 0}
           onClick={(): void => navigateTo(<ManageDevicesPage slide="next" />)}
         >
           Manage devices
@@ -102,7 +102,7 @@ export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageCo
           variant="contained"
           color="primary"
           sx={ CacheNutStyles.submit }
-          disabled={disconnecting != 0}
+          disabled={disconnecting !== 0}
           onClick={addNewDeviceClicked}
         >
           Add a new device
@@ -111,8 +111,8 @@ export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageCo
           variant="outlined"
           color="primary"
           sx={ CacheNutStyles.submit }
-          loading={disconnecting == 1}
-          disabled={disconnecting != 0}
+          loading={disconnecting === 1}
+          disabled={disconnecting !== 0}
           onClick={(): void => {
             setDisconnecting(1);
             controller

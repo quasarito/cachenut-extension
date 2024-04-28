@@ -1,6 +1,6 @@
 {
   "name": "cachenut",
-  "version": "1.0.2.2",
+  "version": "1.0.3",
   "description": "Clipboard across browsers",
   "private": true,
   "author": {
@@ -73,9 +73,10 @@
     "css-minimizer-webpack-plugin": "^4.2.2",
     "eslint": "^8.32.0",
     "eslint-config-prettier": "^8.6.0",
+    "eslint-config-react-app": "^7.0.1",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-jsx-a11y": "^6.7.1",
-    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-n": "^17.3.1",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.32.1",
     "eslint-plugin-react-hooks": "^4.6.0",
