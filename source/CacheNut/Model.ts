@@ -1,3 +1,6 @@
+/* eslint-disable n/no-unsupported-features/node-builtins */
+declare var IS_EXTENSION_BUILD: boolean;
+
 export interface CacheNutAccount {
   id: string;
   deviceId: string;
@@ -60,17 +63,67 @@ export const createClipboardContent = (value: string): ClipboardTextContent | Cl
   return { type: 'text', text: value };
 };
 
+interface ModelStorage {
+  clear(): Promise<void>;
+  get(keys?: string | string[]): Promise<Record<string, string>>;
+  set(items: Record<string, string>): Promise<void>;
+  remove(keys: string | string[]): Promise<void>;
+}
+
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const getLocalStorage = async () => {
-  const browser = await import('webextension-polyfill');
-  return browser.storage.local;
+const getModelStorage = async (): Promise<ModelStorage> => {
+  if (IS_EXTENSION_BUILD) {
+    const browser = await import('webextension-polyfill');
+    return browser.storage.local;
+  }
+  else {
+    return {
+      clear: async () => window.localStorage.clear(),
+      get: async (keys?: string | string[]) => {
+        let result = {} as Record<string, string>;
+        if (Array.isArray(keys)) {
+          keys.forEach(k => {
+            result[k] = window.localStorage.getItem(k);
+          });
+        } else if (keys) { // non-empty string,
+          result[keys] = window.localStorage.getItem(keys);
+        } else { // falsy, return entire storage contents to match web extension api
+          for (let i = 0; i < window.localStorage.length; i++) {
+            const itemKey = window.localStorage.key(i);
+            if (itemKey) {
+              result[itemKey] = window.localStorage.getItem(itemKey);
+            }
+          }
+        }
+        return result;
+      },
+      set: async (items: Record<string, string>) => {
+        Object.entries(items).forEach(([k, v]) => window.localStorage.setItem(k, v));
+      },
+      remove: async (keys: string | string[]) => {
+        if (Array.isArray(keys)) {
+          keys.forEach(k => window.localStorage.removeItem(k));
+        } else {
+          window.localStorage.removeItem(keys)
+        }
+      }
+    };
+  }
 };
 
 export const storeSettings =
-  async (settings: Record<string, string>): Promise<void> => (await getLocalStorage()).set(settings);
+  async (settings: Record<string, string>): Promise<void> => (await getModelStorage()).set(settings);
+
+/**
+ * Return the values of the given storage keys as a map. If no keys are provided,
+ * then return entire storage contents.
+ * 
+ * @param keys zero or more storage keys
+ * @returns a map of keys and its value
+ */
 export const readSettings =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async (keys?: string|string[]): Promise<Record<string, any>> => (await getLocalStorage()).get(keys);
+  async (keys?: string|string[]): Promise<Record<string, any>> => (await getModelStorage()).get(keys);
 
 export const loadAccount = async (): Promise<CacheNutAccount> => {
   const accountItems = await readSettings([ACCOUNT_ID, ACCOUNT_DEVICE_ID, ACCOUNT_TOKEN]);
@@ -93,7 +146,7 @@ export const saveAccount = async (account: CacheNutAccount): Promise<boolean> =>
     .then(() => true)
     .catch(() => false);
 
-export const resetAccount = async (): Promise<void> => (await getLocalStorage()).clear();
+export const resetAccount = async (): Promise<void> => (await getModelStorage()).clear();
 
 export const loadCryptoKey = async (): Promise<CryptoKey | null> => {
   const keyItem = await readSettings(ACCOUNT_CRYPTO_KEY);
@@ -209,7 +262,7 @@ async function resetLocalStorageData(prefix: string): Promise<void> {
   return readSettings()
     .then(async (allData) => {
       const keys = Object.keys(allData).filter((k) => k.startsWith(prefix));
-      return (await getLocalStorage()).remove(keys);
+      return (await getModelStorage()).remove(keys);
     });
 }
 

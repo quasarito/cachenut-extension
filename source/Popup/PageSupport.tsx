@@ -20,6 +20,9 @@ import UAParser from 'ua-parser-js';
 
 import { resetActivationData } from '../CacheNut/Model';
 import { Logger } from '../CacheNut/Support';
+import { HistoryPage } from './HistoryPage';
+
+declare var IS_EXTENSION_BUILD: boolean;
 
 const logger = Logger('PageSupport');
 
@@ -306,7 +309,12 @@ export const CancelActivationButton: React.FC<{message: string; toast: Toast; di
         logger.log(`CancelActivationButton: ${answer}`);
         if (answer === 'Yes') {
           resetActivationData();
-          window.close();
+          if (IS_EXTENSION_BUILD) {
+            window.close();
+          }
+          else {
+            navigateTo(<HistoryPage />);
+          }
         }
       });
     }}
@@ -335,7 +343,9 @@ export const validatingTextField = (disableError: boolean = false, defaultValue?
       defaultValue,
       error: disableError ? false : fieldValue.trim().length === 0,
       inputRef: fieldRef,
-      onChange: (evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => setFieldValue(evt.target.value)
+      onChange: (evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        setFieldValue(evt.target.value);
+      }
     }
   };
 }
@@ -343,16 +353,28 @@ export const validatingTextField = (disableError: boolean = false, defaultValue?
 // Note: webextension-polyfill is lazy-imported to avoid errors in Storybook
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const sendMessage = async (message: any) => {
-  const browser = await import('webextension-polyfill');
-  return browser.runtime.sendMessage(message);
+  if (IS_EXTENSION_BUILD) {
+    const browser = await import('webextension-polyfill');
+    return browser.runtime.sendMessage(message);
+  }
 };
 
 export const createTab = async (url: string) => {
-  const browser = await import('webextension-polyfill');
-  return browser.tabs.create({url});
+  if (IS_EXTENSION_BUILD) {
+    const browser = await import('webextension-polyfill');
+    return browser.tabs.create({url});
+  }
+  else {
+    window.open(url, '_blank');
+  }
 };
 
 export const activeTab = async () => {
-  const browser = await import('webextension-polyfill');
-  return browser.tabs.query({active: true});
+  if (IS_EXTENSION_BUILD) {
+    const browser = await import('webextension-polyfill');
+    return browser.tabs.query({active: true});
+  }
+  else {
+    return [];
+  }
 };

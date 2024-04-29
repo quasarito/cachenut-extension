@@ -60,7 +60,12 @@ import {
 import { Logger } from '../CacheNut/Support';
 import { createHttpClient } from '../CacheNut/HttpClient';
 import { CopyContentPage } from './CopyContentPage';
+import { Options } from '../Options/Options';
 import { UnregisteredPage } from './UnregisteredPage';
+
+declare var IS_EXTENSION_BUILD: boolean;
+// eslint-disable-next-line n/no-unsupported-features/node-builtins
+declare var navigator: Navigator;
 
 const logger = Logger('HistoryPage');
 
@@ -84,7 +89,8 @@ const CardStyle = {
   width: '100%'
 }
 
-export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryController;}> = ({mock,slide}) => {
+export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryController;}> =
+({mock,slide}) => {
   const [ clipItems, setClipboardItems ] = React.useState([] as ClipboardItem[]);
   const [ isClipsLoaded, setClipsLoaded ] = React.useState(false);
   const [ isMenuOpen, openMenu ] = React.useState(false);
@@ -195,7 +201,7 @@ export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryControl
             <ContentCopyOutlined />
           </IconButton>
         </Tooltip>
-        <Tooltip title="Preview image">
+        <Tooltip title="View image in new tab">
           <IconButton
             color="primary"
             size="small"
@@ -249,44 +255,61 @@ export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryControl
   };
 
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  const menuItems = () => (
-    <List>
-      <ListItemButton onClick={(): void => {
-        createHttpClient()
-        .then(async (client) => {
-          const tabs = await activeTab();
-          if (tabs.length > 0 && tabs[0].url) {
-            await client.cache({
-              type: 'url',
-              url: tabs[0].url,
-            } as ClipboardContent);
-            setClipsLoaded(false);
-            await toast.success('Tab location copied to Cache Nut.');
-          }
-          else {
-            await toast.warning('Unable to copy tab location.');
-          }
-        });
-      }}>
-        <ListItemText primary="Copy tab location" />
-      </ListItemButton>
-      <ListItemButton onClick={
+  const menuItems = () => {
+    const items = [
+      <ListItemButton key="copy-cb-content" onClick={
         (): void => {
           openMenu(false);
           navigateTo(<CopyContentPage slide="next" />);
         }}>
         <ListItemText primary="Copy clipboard content" />
-      </ListItemButton>
-      <Divider />
-      <ListItemButton onClick={
+      </ListItemButton>,
+      <Divider key="e" />,
+      <ListItemButton key="account" onClick={
         (): void => {
           openMenu(false);
           navigateTo(<AccountPage slide="next" />);
         }}>
         <ListItemText primary="Account" />
       </ListItemButton>
-    </List>
-  );
+    ];
+
+    if (IS_EXTENSION_BUILD) {
+      items.unshift( // add to the top of menu
+        <ListItemButton key="copy-tab-location" onClick={(): void => {
+          createHttpClient()
+          .then(async (client) => {
+            const tabs = await activeTab();
+            if (tabs.length > 0 && tabs[0].url) {
+              await client.cache({
+                type: 'url',
+                url: tabs[0].url,
+              } as ClipboardContent);
+              setClipsLoaded(false);
+              await toast.success('Tab location copied to Cache Nut.');
+            }
+            else {
+              await toast.warning('Unable to copy tab location.');
+            }
+          });
+        }}>
+          <ListItemText primary="Copy tab location" />
+        </ListItemButton>
+      );
+    }
+    else {
+      items.push( // add to the bottom of menu
+        <ListItemButton key="options" onClick={(): void => {
+          openMenu(false);
+          navigateTo(<Options />);
+        }}>
+          <ListItemText primary="Options" />
+        </ListItemButton>
+      );
+    }
+
+    return (<List>{items}</List>);
+  }
 
   let gridListItems: React.ReactNode;
   if (isClipsLoaded) {

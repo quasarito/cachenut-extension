@@ -6,6 +6,9 @@ import { createHttpClient } from '../CacheNut/HttpClient';
 import { ClipboardContent, loadAccount } from '../CacheNut/Model';
 import { Logger } from '../CacheNut/Support';
 
+// eslint-disable-next-line n/no-unsupported-features/node-builtins
+declare var navigator: Navigator;
+
 const logger = Logger('BackgroundIndex');
 
 function copyClicked(info: Menus.OnClickData): void {

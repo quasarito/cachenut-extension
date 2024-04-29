@@ -33,7 +33,7 @@ import { createCryptoKey } from '../CacheNut/Crypto';
 function createNewAccountPageController(): NewAccountPageController {
   return {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    createAccount: async (deviceNameInput: any): Promise<[CacheNutAccount, null] | [null, string]> => {
+    createAccount: async (deviceNameInput: string): Promise<[CacheNutAccount, null] | [null, string]> => {
       const deviceName = deviceNameInput;
       return register(deviceName).then(async (account) => {
         if (await saveAccount(account)) {
@@ -122,5 +122,5 @@ export const NewAccountPage: React.FC<{slide?: SlideDirection; mock?: NewAccount
 
 export interface NewAccountPageController {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  createAccount: (input: any) => Promise<[CacheNutAccount, null] | [null, string]>;
+  createAccount: (input: string) => Promise<[CacheNutAccount, null] | [null, string]>;
 }

@@ -11,7 +11,7 @@ Edit the source file `Config.ts` and set the URL of the Cache Nut server:
   baseUrl: 'http://localhost:3000/api',
 ```
 Pre-requisites:
-- nodejs v18
+- nodejs v20
 - yarn 4
 
 Install nvm for nodejs:

@@ -1,3 +1,4 @@
+/* eslint-disable n/no-unsupported-features/node-builtins */
 import { Base64 } from 'js-base64';
 import { ClipboardItemMeta } from './Model';
 

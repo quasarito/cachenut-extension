@@ -4,16 +4,17 @@ import { loadAccount, loadActivationData, resetActivationData } from '../CacheNu
 import { Logger} from '../CacheNut/Support';
 import { AddDeviceAccessCodePage } from './AddDeviceAccessCodePage';
 import { AddDeviceLinkCodePage } from './AddDeviceLinkCodePage';
+import { Config } from '../CacheNut/Config';
 import { ConnectAccessCodePage } from './ConnectAccessCodePage';
 import { ConnectLinkCodePage } from './ConnectLinkCodePage';
 import { HistoryPage } from './HistoryPage';
 import { navigateTo } from './PageSupport';
-
 import { UnregisteredPage } from './UnregisteredPage';
 
 const logger = Logger('PopupIndex');
 
 function init(): void {
+  logger.log(`Using endpoint: ${Config.baseUrl}`);
   Promise.all([loadAccount().catch(() => null), loadActivationData()])
     .then(([account, activation]) => {
       if (account) {

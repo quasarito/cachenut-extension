@@ -17,6 +17,7 @@ const destPath = path.join(__dirname, 'extension');
 const nodeEnv = process.env.NODE_ENV || 'development';
 const buildOnly = process.env.BUILD_ONLY === 'true';
 const targetBrowser = process.env.TARGET_BROWSER;
+const isExtensionBuild = targetBrowser !== 'web';
 
 const extensionReloaderPlugin =
   nodeEnv === 'development' && !buildOnly
@@ -77,17 +78,20 @@ module.exports = {
 
   module: {
     rules: [
-      {
-        type: 'javascript/auto', // prevent webpack handling json with its own loaders,
-        test: /manifest\.json$/,
-        use: {
-          loader: 'wext-manifest-loader',
-          options: {
-            usePackageJSONVersion: true, // set to false to not use package.json version for manifest
-          },
-        },
-        exclude: /node_modules/,
-      },
+      ...(isExtensionBuild
+        ? [{
+            type: 'javascript/auto', // prevent webpack handling json with its own loaders,
+            test: /manifest\.json$/,
+            use: {
+              loader: 'wext-manifest-loader',
+              options: {
+                usePackageJSONVersion: true, // set to false to not use package.json version for manifest
+              },
+            },
+            exclude: /node_modules/,
+          }]
+        : []
+      ),
       {
         test: /\.(js|ts)x?$/,
         loader: 'babel-loader',
@@ -130,6 +134,8 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       IS_DEV_BUILD: nodeEnv === 'development',
+      IS_EXTENSION_BUILD: isExtensionBuild,
+      APP_VERSION: JSON.stringify(require("./package.json").version),
       BUILT_AT: nodeEnv === 'production'
         ? JSON.stringify(new Date().getFullYear())
         : JSON.stringify(new Date().toISOString().slice(0,-5).replaceAll(/[-:.TZ]/g,''))
@@ -153,20 +159,34 @@ module.exports = {
       cleanStaleWebpackAssets: false,
       verbose: true,
     }),
-    new HtmlWebpackPlugin({
-      template: path.join(viewsPath, 'popup.html'),
-      inject: 'body',
-      chunks: ['popup'],
-      hash: true,
-      filename: 'popup.html',
-    }),
-    new HtmlWebpackPlugin({
-      template: path.join(viewsPath, 'options.html'),
-      inject: 'body',
-      chunks: ['options'],
-      hash: true,
-      filename: 'options.html',
-    }),
+    ...(
+      isExtensionBuild
+        ? [
+            new HtmlWebpackPlugin({
+              template: path.join(viewsPath, 'popup.html'),
+              inject: 'body',
+              chunks: ['popup'],
+              hash: true,
+              filename: 'popup.html',
+            }),
+            new HtmlWebpackPlugin({
+              template: path.join(viewsPath, 'options.html'),
+              inject: 'body',
+              chunks: ['options'],
+              hash: true,
+              filename: 'options.html',
+            })
+          ]
+        : [
+            new HtmlWebpackPlugin({
+              template: path.join(viewsPath, 'index.html'),
+              inject: 'body',
+              chunks: ['popup'],
+              hash: true,
+              filename: 'index.html',
+            })
+          ]
+    ),
     // write css file(s) to build folder
     new MiniCssExtractPlugin({filename: 'css/[name].css'}),
     // copy static assets
