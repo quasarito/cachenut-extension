@@ -16,28 +16,20 @@ Pre-requisites:
 
 Install nvm for nodejs:
 ```bash
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
 ``````
 
 After installation is complete, **open a new terminal** so nvm is available.
 ```bash
-nvm install 18
+nvm install 20
 ```
 ```bash
-nvm use 18
+nvm use 20
 ```
 
 Enable `yarn`:
 ```bash
 corepack enable
-```
-
-Required by third-party library `node-sass` for build:
-- python3
-- make
-```bash
-# on Debian-based systems
-sudo apt install python3 build-essential
 ```
 
 Clone cachenut project:
