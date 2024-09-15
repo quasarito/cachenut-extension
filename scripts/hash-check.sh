@@ -12,25 +12,36 @@
 which sha256deep > /dev/null 2>&1
 if [ "$?" != "0" ]; then
   echo "Missing sha256deep command"
-  exit 1
+  MISSING_EXEC="true"
 fi
 
 which unzip > /dev/null 2>&1
 if [ "$?" != "0" ]; then
   echo "Missing unzip command"
-  exit 1
+  MISSING_EXEC="true"
 fi
 
 which sha1sum > /dev/null 2>&1
-if [ "$?" != "0" ]; then
-  echo "Missing sha1sum command"
+if [ "$?" == "0" ]; then
+  SHASUM_EXEC="sha1sum"
+else
+  which shasum > /dev/null 2>&1 # macos has shasum included
+  if [ "$?" == "0" ]; then
+    SHASUM_EXEC="shasum -a 1"
+  else
+    echo "Missing sha1sum command"
+    MISSING_EXEC="true"
+  fi
+fi
+
+if [ "$MISSING_EXEC" == "true" ]; then
   exit 1
 fi
 
 function do_hash_folder() {
   FOLDER="$1"
   pushd $FOLDER > /dev/null
-  echo $(sha256deep -rl * | sort | sha1sum)
+  echo $(sha256deep -rl * | sort | $SHASUM_EXEC)
   popd > /dev/null
 }
 

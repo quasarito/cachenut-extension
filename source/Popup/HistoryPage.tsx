@@ -9,12 +9,9 @@ import {
   CardHeader,
   CircularProgress,
   Collapse,
-  Container,
   CssBaseline,
   Divider,
   Drawer,
-  ImageList,
-  ImageListItem,
   IconButton,
   List,
   ListItemText,
@@ -23,14 +20,19 @@ import {
   Tooltip,
   Typography,
   ListItemButton,
+  Fab,
+  Zoom,
+  Stack,
 } from '@mui/material';
 import {
+  AddOutlined,
+  ContentCopyOutlined,
   ExpandMoreOutlined,
-  FileCopyOutlined,
   ImageOutlined,
   LinkOutlined,
   MenuOutlined,
   OpenInNewOutlined,
+  PreviewOutlined,
   RefreshOutlined,
   TextFieldsOutlined,
 } from '@mui/icons-material';
@@ -62,24 +64,12 @@ import { UnregisteredPage } from './UnregisteredPage';
 
 const logger = Logger('HistoryPage');
 
-const ELLIPSIS_LENGTH = 40;
-function ellipsis(text: string): string {
-  let ellipsisText = text;
-  if (text.length > ELLIPSIS_LENGTH) {
-    ellipsisText = `${text.substr(0, ELLIPSIS_LENGTH)}...`;
-  }
-  return ellipsisText;
-}
-
 function ellipsisTooltip(text: string): string | JSX.Element {
-  if (text?.length > ELLIPSIS_LENGTH) {
-    return (
-      <Tooltip title={text}>
-        <span>{ellipsis(text)}</span>
-      </Tooltip>
-    );
-  }
-  return text;
+  return (
+    <Tooltip title={text}>
+      <span>{text}</span>
+    </Tooltip>
+  );
 }
 
 function createHistoryController(): HistoryController {
@@ -88,6 +78,10 @@ function createHistoryController(): HistoryController {
       return createHttpClient().then(async (client) => client.list());
     }    
   }
+}
+
+const CardStyle = {
+  width: '100%'
 }
 
 export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryController;}> = ({mock,slide}) => {
@@ -158,19 +152,21 @@ export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryControl
 
   const CardUrl: React.FC<{url: string; ts: number | Date; expires?: number | Date;}> =
   ({url, ts, expires}) => (
-    <Card variant="outlined">
+    <Card variant="outlined" sx={CardStyle}>
       <CardHeader
         avatar={<Avatar><LinkOutlined /></Avatar>}
+        sx={{ '& .MuiCardHeader-content': {overflow: "hidden"} }}
         title={ellipsisTooltip(url)}
+        titleTypographyProps={{noWrap: true, component: "p"}}
         subheader={elapsedOrExpiredDuration(ts, expires)}
       />
       <CardActions>
         <Tooltip title="Copy to clipboard">
           <IconButton color="primary" size="small" onClick={copyToClipboard(url)}>
-            <FileCopyOutlined />
+            <ContentCopyOutlined />
           </IconButton>
         </Tooltip>
-        <Tooltip title="Open URL in new tab">
+        <Tooltip title="Open location in new tab">
           <IconButton
             color="primary"
             size="small"
@@ -185,16 +181,27 @@ export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryControl
 
   const CardImage: React.FC<{url: string; ts: number | Date; expires: number | Date;}> =
   ({url, ts, expires}) => (
-    <Card variant="outlined">
+    <Card variant="outlined" sx={CardStyle}>
       <CardHeader
         avatar={<Avatar><ImageOutlined /></Avatar>}
+        sx={{ '& .MuiCardHeader-content': {overflow: "hidden"} }}
         title={ellipsisTooltip(url)}
+        titleTypographyProps={{noWrap: true, component: "p"}}
         subheader={elapsedOrExpiredDuration(ts, expires)}
       />
       <CardActions>
-        <Tooltip title="Copy to clipboard">
+        <Tooltip title="Copy location to clipboard">
           <IconButton color="primary" size="small" onClick={copyToClipboard(url)}>
-            <FileCopyOutlined />
+            <ContentCopyOutlined />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Preview image">
+          <IconButton
+            color="primary"
+            size="small"
+            onClick={(): void => { createTab(url); }}
+          >
+            <PreviewOutlined />
           </IconButton>
         </Tooltip>
       </CardActions>
@@ -209,18 +216,20 @@ export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryControl
     };
 
     return (
-      <Card variant="outlined">
+      <Card variant="outlined" sx={CardStyle}>
         <CardHeader
           avatar={<Avatar><TextFieldsOutlined /></Avatar>}
           action={
             <IconButton
               onClick={handleExpandClick}
               sx={expanded ? CacheNutStyles.expandClose : CacheNutStyles.expandOpen }
-              size="large">
+              size="medium">
               <ExpandMoreOutlined />
             </IconButton>
           }
-          title={ellipsis(text)}
+          sx={{ '& .MuiCardHeader-content': {overflow: "hidden"} }}
+          title={text}
+          titleTypographyProps={{noWrap: true, component: "p"}}
           subheader={elapsedOrExpiredDuration(ts, expires)}
         />
         <Collapse in={expanded} timeout="auto" unmountOnExit>
@@ -231,7 +240,7 @@ export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryControl
         <CardActions>
           <Tooltip title="Copy to clipboard">
             <IconButton color="primary" size="small" onClick={copyToClipboard(text)}>
-              <FileCopyOutlined />
+              <ContentCopyOutlined />
             </IconButton>
           </Tooltip>
         </CardActions>
@@ -287,41 +296,25 @@ export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryControl
         switch (item.content.type) {
           case 'image': {
             const imageItem = item.content as ClipboardUrlContent;
-            return (
-              <ImageListItem key={item.createTs} style={{height: 'auto'}}>
-                <CardImage url={imageItem.url} ts={item.createTs} expires={item.expiresAt} />
-              </ImageListItem>
-            );
+            return <CardImage key={item.createTs} url={imageItem.url} ts={item.createTs} expires={item.expiresAt} />;
           }
           case 'url': {
             const urlItem = item.content as ClipboardUrlContent;
-            return (
-              <ImageListItem key={item.createTs} style={{height: 'auto'}}>
-                <CardUrl url={urlItem.url} ts={item.createTs} expires={item.expiresAt} />
-              </ImageListItem>
-            );
+            return <CardUrl key={item.createTs} url={urlItem.url} ts={item.createTs} expires={item.expiresAt} />;
           }
           case 'text':
           default: {
             const textItem = item.content as ClipboardTextContent;
-            return (
-              <ImageListItem key={item.createTs} style={{height: 'auto'}}>
-                <CardText text={textItem.text} ts={item.createTs} expires={item.expiresAt} />
-              </ImageListItem>
-            );
+            return <CardText key={item.createTs} text={textItem.text} ts={item.createTs} expires={item.expiresAt} />;
           }
         }
       });
     } else {
-      gridListItems = (
-        <ImageListItem style={{height: 'auto'}}>
-          <Typography>Empty</Typography>
-        </ImageListItem>
-      );
+      gridListItems = <Typography>Empty</Typography>;
     }
   }
 
-  const contentBody = gridListItems ? <ImageList cols={1}>{gridListItems}</ImageList> : <CircularProgress />;
+  const contentBody = gridListItems ?? <CircularProgress />;
   return <>
     <AppBar position="static">
       <Toolbar variant="dense">
@@ -348,10 +341,16 @@ export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryControl
     </AppBar>
     <CssBaseline />
     <Slide direction={slideDirection(slide)} in>
-      <Container sx={ CacheNutStyles.paper }>
+      <Stack sx={{...CacheNutStyles.paper, padding: '0 16px'}} spacing={1/2}>
         {contentBody}
-      </Container>
+      </Stack>
     </Slide>
+    <Zoom in={true} timeout={950}>
+      <Fab size="medium" color="primary" sx={ { position: 'absolute', bottom: 16, right: 16} }
+        onClick={() => navigateTo(<CopyContentPage slide="next" />)}>
+        <AddOutlined />
+      </Fab>
+    </Zoom>
     {ToastComponent(toast)}
     <Drawer
       anchor="left"

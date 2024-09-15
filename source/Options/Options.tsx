@@ -8,10 +8,10 @@ import {
   CardContent,
   CardHeader,
   Collapse,
-  Container,
   CssBaseline,
   Divider,
   IconButton,
+  Stack,
   SxProps,
   TextField,
   Toolbar,
@@ -141,7 +141,7 @@ export const Options: React.FC = () => {
     </AppBar>
     <CssBaseline />
     <Divider />
-    <Container sx={ OptionsStyles.paper }>
+    <Stack sx={{...OptionsStyles.paper, padding: '0 16px'}} spacing={1/2}>
       <Card variant="outlined">
         <CardHeader
           title="Sync account data"
@@ -251,7 +251,7 @@ export const Options: React.FC = () => {
       <Typography variant="caption" display="block" gutterBottom>
         Build: {browser.runtime.getManifest().version}:{BUILT_AT}
       </Typography>
-    </Container>
+    </Stack>
     {ToastComponent(toast)}
   </>;
 };
