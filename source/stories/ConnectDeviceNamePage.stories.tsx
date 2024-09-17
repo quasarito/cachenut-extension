@@ -13,19 +13,19 @@ export default {
   component: ConnectDeviceNamePage,
 } as Meta;
 
-const Template: StoryFn = ({accountId, error}) => {
+const Template: StoryFn = ({accountId, error, delayMillis}) => {
   const mock: ConnectDeviceNameController = {
     registerAsDevice: async (name) => {
       console.log(`registerAsDevice: ${name}`);
       if (error) {
-        return Promise.resolve([null, error]);
+        return new Promise(resolve => setTimeout(() => resolve([null, error]), delayMillis || 0));
       }
       const account: CacheNutAccount = {
         id: accountId,
         deviceId: 'test-device',
         token: 'test-token',
       };
-      return Promise.resolve([account, null]);
+      return new Promise(resolve => setTimeout(() => resolve([account, null]), delayMillis || 0));
     },
   };
   return <ConnectDeviceNamePage mock={mock} />;
@@ -35,4 +35,5 @@ export const Page = Template.bind({});
 Page.args = {
   accountId: 'FFA29C89-7A79-4C78-94D9-2CC0E9CA5A03',
   error: '',
+  delayMillis: 0
 };

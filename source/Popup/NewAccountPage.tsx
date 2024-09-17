@@ -34,7 +34,7 @@ function createNewAccountPageController(): NewAccountPageController {
   return {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     createAccount: async (deviceNameInput: any): Promise<[CacheNutAccount, null] | [null, string]> => {
-      const deviceName = deviceNameInput.value;
+      const deviceName = deviceNameInput;
       return register(deviceName).then(async (account) => {
         if (await saveAccount(account)) {
           // generate the encryption key for the new account
@@ -55,7 +55,6 @@ export const NewAccountPage: React.FC<{slide?: SlideDirection; mock?: NewAccount
   const deviceName = validatingTextField(true, createDeviceName());
   const toast: Toast = {} as Toast;
   const controller = mock || createNewAccountPageController();
-  const defaultName = createDeviceName();
   const [ registering, setRegistering ] = React.useState(0); // 0=unregistered, 1=registering, -1=registered
 
   return <>
@@ -65,7 +64,7 @@ export const NewAccountPage: React.FC<{slide?: SlideDirection; mock?: NewAccount
           edge="start"
           color="inherit"
           aria-label="menu"
-          disabled={registering != 0}
+          disabled={registering !== 0}
           onClick={(): void => navigateTo(<UnregisteredPage slide="done" />)}
           size="large">
           <ArrowBackOutlined />
@@ -82,15 +81,15 @@ export const NewAccountPage: React.FC<{slide?: SlideDirection; mock?: NewAccount
         Create a new account for this device.
         <TextField fullWidth
           label="Device name"
-          disabled={registering != 0}
+          disabled={registering !== 0}
           {...deviceName.textFieldProps}
         />
         <LoadingButton
           variant="contained"
           color="primary"
           sx={ CacheNutStyles.submit }
-          loading={registering == 1}
-          disabled={ registering == -1 || deviceName.disableInput }
+          loading={registering === 1}
+          disabled={ registering === -1 || deviceName.disableInput }
           onClick={() => {
             setRegistering(1);
             controller.createAccount(deviceName.value)

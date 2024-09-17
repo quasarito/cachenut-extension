@@ -132,7 +132,7 @@ module.exports = {
       IS_DEV_BUILD: nodeEnv === 'development',
       BUILT_AT: nodeEnv === 'production'
         ? JSON.stringify(new Date().getFullYear())
-        : JSON.stringify(new Date().toISOString().slice(0,-5).replaceAll(/[-:\.TZ]/g,''))
+        : JSON.stringify(new Date().toISOString().slice(0,-5).replaceAll(/[-:.TZ]/g,''))
     }),
     // Plugin to not generate js bundle for manifest entry
     new WextManifestWebpackPlugin(),

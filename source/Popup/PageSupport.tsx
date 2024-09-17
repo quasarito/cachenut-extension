@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import {
   Alert,
   Button,
@@ -12,7 +13,7 @@ import {
   StyledEngineProvider,
 } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
-import { Close, PsychologyRounded } from '@mui/icons-material';
+import { Close } from '@mui/icons-material';
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import UAParser from 'ua-parser-js';
@@ -69,7 +70,7 @@ export const CacheNutStyles = {
 
 export type SlideDirection = 'next' | 'back' | 'start' | 'done';
 
-export const slideDirection = (direction: SlideDirection | undefined): 'left' | 'right' | 'down' | 'up' => {
+export const slideDirection = (direction?: SlideDirection): 'left' | 'right' | 'down' | 'up' => {
   switch (direction) {
     case 'next':
       return 'left';
@@ -93,14 +94,11 @@ const findRoot = () => {
       || document.querySelector('div[id^="story--example"][id$="page--primary-inner"]');
   }
 
-  return rootElement == appRootElement
-    ? [ appRoot, appRootElement ]
-    : [ createRoot(rootElement), rootElement ];
+  return createRoot(rootElement);
 };
 
-const [ appRoot, appRootElement ] = findRoot();
+const appRoot = findRoot();
 export const navigateTo = (page: React.ReactElement): void => {
-  // toast?.close();
   appRoot.render(
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={cacheNutTheme}>{page}</ThemeProvider>
@@ -297,9 +295,11 @@ export const ToastComponent = (
   );
 };
 
-export const CancelActivationButton: React.FC<{message: string; toast: Toast;}> = ({ message, toast }) => (
+export const CancelActivationButton: React.FC<{message: string; toast: Toast; disabled?: boolean}> =
+({ message, toast, disabled=false }) => (
   <Button
     color="inherit" // was "default"
+    disabled={disabled}
     onClick={(): void => {
       toast.prompt(message, ['Yes', 'No'])
       .then((answer) => {
@@ -319,7 +319,7 @@ export class PageError extends Error {
   constructor(readonly message: string, readonly thrown: unknown) {
     super();
   }
-};
+}
 
 export const validatingTextField = (disableError: boolean = false, defaultValue?: string) => {
   const fieldRef = React.useRef<any>();
@@ -335,7 +335,7 @@ export const validatingTextField = (disableError: boolean = false, defaultValue?
       defaultValue,
       error: disableError ? false : fieldValue.trim().length === 0,
       inputRef: fieldRef,
-      onChange: evt => setFieldValue(evt.target.value),
+      onChange: (evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => setFieldValue(evt.target.value)
     }
   };
 }
@@ -343,19 +343,16 @@ export const validatingTextField = (disableError: boolean = false, defaultValue?
 // Note: webextension-polyfill is lazy-imported to avoid errors in Storybook
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const sendMessage = async (message: any) => {
-  // eslint-disable-next-line node/no-unsupported-features/es-syntax
   const browser = await import('webextension-polyfill');
   return browser.runtime.sendMessage(message);
 };
 
 export const createTab = async (url: string) => {
-  // eslint-disable-next-line node/no-unsupported-features/es-syntax
   const browser = await import('webextension-polyfill');
   return browser.tabs.create({url});
 };
 
 export const activeTab = async () => {
-  // eslint-disable-next-line node/no-unsupported-features/es-syntax
   const browser = await import('webextension-polyfill');
   return browser.tabs.query({active: true});
 };

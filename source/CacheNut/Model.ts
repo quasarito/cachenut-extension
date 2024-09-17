@@ -62,7 +62,6 @@ export const createClipboardContent = (value: string): ClipboardTextContent | Cl
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const getLocalStorage = async () => {
-  // eslint-disable-next-line node/no-unsupported-features/es-syntax
   const browser = await import('webextension-polyfill');
   return browser.storage.local;
 };

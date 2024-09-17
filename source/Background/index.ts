@@ -33,6 +33,13 @@ function copyClicked(info: Menus.OnClickData): void {
     };
     logger.log('linkClicked');
   }
+  if (info.menuItemId === 'copyBookmarkMenuId') { // FF-only
+    copyItem = {
+      type: 'url',
+      url: info.pageUrl,
+    };
+    logger.log('bookmarkMenuClicked');
+  }
 
   logger.log('copyContent=', copyItem);
   if (copyItem) {

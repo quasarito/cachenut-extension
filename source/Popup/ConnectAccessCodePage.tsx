@@ -118,7 +118,6 @@ export const ConnectAccessCodePage: React.FC<{slide?: SlideDirection;mock?: Conn
         Enter the access code displayed on the active device.
         <TextField fullWidth
           label="Access code"
-          inputRef={accessCode.inputRef}
           {...accessCode.textFieldProps}
         />
         <Button
