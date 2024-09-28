@@ -75,7 +75,7 @@ export const ConnectLinkCodePage: React.FC<{slide?: SlideDirection;mock?: Connec
     ? 'Enter the link code below on the active device.'
     : '';
   const linkCodeElement = linkExists ? (
-    <Typography variant="h6" gutterBottom>
+    <Typography id="link_code" variant="h6" gutterBottom>
       {formatCode(linkCode, ' - ')}
     </Typography>
   ) : (

@@ -25,7 +25,7 @@ import {
   validatingTextField,
 } from './PageSupport';
 import { AccountPage } from './AccountPage';
-import { getAccountAuth, register } from '../CacheNut/HttpClient';
+import { CacheNutHttpClientError, getAccountAuth, register } from '../CacheNut/HttpClient';
 import {
   CacheNutAccount,
   loadActivationData,
@@ -52,6 +52,9 @@ function createConnectDeviceNameController(): ConnectDeviceNameController {
         }
         catch (err) {
           console.error('registerAsDevice:', err);
+          if (err instanceof CacheNutHttpClientError && err.message === '404') {
+            return [ null, 'You must complete authorization on the other device first.' ];
+          }
           throw err;
         }
       }
@@ -110,6 +113,7 @@ export const ConnectDeviceNamePage: React.FC<{slide?: SlideDirection;mock?: Conn
               }
             })
             .catch((err) => {
+              setDone(false);
               toast.error(err.message || 'An error occurred. Try again.');
             });
           }}

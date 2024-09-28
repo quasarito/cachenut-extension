@@ -53,6 +53,27 @@ yarn build
 ```
 Build artifacts will be created in `extension` folder.
 
+## Testing
+
+### Storybook
+
+To view and interact with the application pages in isolation:
+```bash
+yarn run storybook
+```
+
+### Playwright
+
+To run the tests as a chrome extension:
+```bash
+yarn run playwright:extension
+```
+
+To run the tests as a web app:
+```bash
+yarn run playwright:web
+```
+
 ## License
 
 MIT

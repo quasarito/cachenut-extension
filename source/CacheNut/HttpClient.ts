@@ -22,9 +22,9 @@ export interface CacheNutResponse<T> {
   response: Response;
 }
 
-class CacheNutHttpClientError<T> extends Error {
+export class CacheNutHttpClientError<T> extends Error {
   constructor(readonly status: number, readonly body: T) {
-    super();
+    super(`${status}`);
   }
 }
 
@@ -170,7 +170,8 @@ export const createHttpClient = async (): Promise<CacheNutHttpClient> => {
   if (account && key) {
     return new CacheNutHttpClient(account.id, account.token, key);
   }
-  return Promise.reject(new Error('No account.'));
+  // account is never falsy, so encryption key must be missing
+  return Promise.reject(new Error('No encryption key to create client.'));
 };
 
 export const requestAccessCode = async (payload: KeyPayload): Promise<string> => {

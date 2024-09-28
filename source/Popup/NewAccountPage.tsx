@@ -63,7 +63,7 @@ export const NewAccountPage: React.FC<{slide?: SlideDirection; mock?: NewAccount
         <IconButton
           edge="start"
           color="inherit"
-          aria-label="menu"
+          aria-label="back"
           disabled={registering !== 0}
           onClick={(): void => navigateTo(<UnregisteredPage slide="done" />)}
           size="large">

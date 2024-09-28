@@ -92,7 +92,7 @@ export const AddDeviceAccessCodePage: React.FC<{slide?: SlideDirection; mock?: A
     accessCodeBody = (
       <>
         Enter the access code below on the new device
-        <Typography gutterBottom>{formatCode(accessCode, ' - ')}</Typography>
+        <Typography id="access_code" gutterBottom>{formatCode(accessCode, ' - ')}</Typography>
         <Button
           variant="contained"
           color="primary"
@@ -137,7 +137,7 @@ export const AddDeviceAccessCodePage: React.FC<{slide?: SlideDirection; mock?: A
         <IconButton
           edge="start"
           color="inherit"
-          aria-label="menu"
+          aria-label="back"
           onClick={(): void => navigateTo(<AccountPage />)}
           size="large">
           <ArrowBackOutlined />

@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import {
+  Alert,
   AppBar,
   CircularProgress,
   Container,
@@ -36,33 +37,55 @@ import { createHttpClient } from '../CacheNut/HttpClient';
 
 const logger = Logger('ManageDevicesPage:');
 
-export const ManageDevicesPage: React.FC<{slide?: SlideDirection}> = ({slide}) => {
+function createManageDevicesController(): ManageDevicesController {
+  return {
+    getAccount: async (): Promise<CacheNutAccount> => {
+      return loadAccount();
+    },
+    loadDeviceList: async (): Promise<Device[]> => {
+      return createHttpClient().then(async (client) => client.loadDeviceList());
+    },
+    removeDevice: async (deviceId: string): Promise<boolean> => {
+      return createHttpClient().then(async (client) => client.removeDevice(deviceId));
+    },
+    updateDevice: async (deviceId: string, isTrusted: boolean): Promise<boolean> => {
+      return createHttpClient()
+      .then(async (client) => client.updateDevice(deviceId, { manageDevice: isTrusted }));
+    }
+  }
+}
+
+export const ManageDevicesPage: React.FC<{slide?: SlideDirection, mock?: ManageDevicesController;}> =
+({slide, mock}) => {
+
   const [ account, setAccount ] = React.useState({} as CacheNutAccount);
   const [ deviceList, setDeviceList ] = React.useState([] as Device[]);
+  const controller = mock || createManageDevicesController();
   const toast: Toast = {} as Toast;
 
   React.useEffect(() => {
     if (!account.id) {
-      loadAccount().then((acct) => {
+      controller.getAccount()
+      .then((acct) => {
         if (acct.id) {
           setAccount(acct);
+          if (deviceList.length === 0) {
+            controller.loadDeviceList()
+              .then((devices) => setTimeout(() => setDeviceList(devices), 250))
+              .catch((err) => {
+                logger.log(err);
+              });
+          }
         }
+      })
+      .catch((err) => {
+        logger.log(err);
       });
-    }
-  });
-  React.useEffect(() => {
-    if (deviceList.length === 0) {
-      createHttpClient()
-        .then(async (client) => client.loadDeviceList())
-        .then((devices) => setTimeout(() => setDeviceList(devices), 500));
     }
   });
 
   const updateTrustedDevice = (deviceId: string, isTrusted: boolean): void => {
-    createHttpClient()
-    .then(async (client) =>
-      client.updateDevice(deviceId, { manageDevice: isTrusted })
-    )
+    controller.updateDevice(deviceId, isTrusted)
     .then((updated) => {
       if (updated) {
         const updatedDevice = deviceList.find(
@@ -90,70 +113,71 @@ export const ManageDevicesPage: React.FC<{slide?: SlideDirection}> = ({slide}) =
     });
   };
 
-  const deviceListItems = deviceList.map((device) => (
-    <ListItem key={device.deviceId + Date.now()}>
-      <ListItemIcon>
-        <Tooltip
-          title={device.manageDevice ? 'Trusted' : 'Shared'}
-          enterDelay={1000}
-        >
-          <Switch
-            edge="start"
-            onChange={(event): void => { updateTrustedDevice(device.deviceId, event.target.checked); }}
-            checked={device.manageDevice}
-          />
-        </Tooltip>
-      </ListItemIcon>
-      <Tooltip
-        title={`Device id: ${device.deviceId}, Last access: ${device.createDate.toLocaleString()}`}
-        enterDelay={1000}>
-        <ListItemText
-          primary={device.name}
-          secondary={
-            (account.deviceId === device.deviceId) ? 'This browser'
-              : `Last access: ${timeElapsed(device.createDate)} ago`
-          }
-        />
-      </Tooltip>
-      <ListItemSecondaryAction>
-        <Tooltip title="Remove device from account" enterDelay={1000}>
-          <IconButton
-            edge="end"
-            onClick={(): void => {
-              toast.prompt(`Permanently remove ${device.name}?`, ['Yes', 'No'])
-              .then((answer) => {
-                if (answer === 'Yes') {
-                  createHttpClient()
-                  .then(async (client) => client.removeDevice(device.deviceId))
-                  .then((updated) => {
-                    if (updated) {
-                      toast.success('Device removed.');
-                      setDeviceList(deviceList.filter((d) => d.deviceId !== device.deviceId));
-                    }
-                    else {
-                      logger.log(`Could not remove device: ${device.deviceId}`);
-                      toast.error('Failed to remove device.');
-                    }
-                  })
-                  .catch((err) => {
-                    logger.log(`Could not remove device: ${device.deviceId}`, err);
-                    if (err.status === 403) {
-                      toast.error('Not allowed from this browser.');
-                    }
-                    else {
-                      toast.error('Failed to remove device.');
+  const deviceListItems = account?.id
+    && deviceList.map((device, idx) => (
+        <ListItem key={device.deviceId + Date.now()}>
+          <ListItemIcon>
+            <Tooltip
+              title={device.manageDevice ? 'Trusted' : 'Shared'}
+              enterDelay={1000}
+            >
+              <Switch
+                edge="start"
+                onChange={(event): void => { updateTrustedDevice(device.deviceId, event.target.checked); }}
+                checked={device.manageDevice}
+              />
+            </Tooltip>
+          </ListItemIcon>
+          <Tooltip
+            title={`Device id: ${device.deviceId}, registered: ${device.createDate.toLocaleString()}`}
+            enterDelay={1000}>
+            <ListItemText
+              id={`device_item_${idx}`}
+              primary={device.name}
+              secondary={
+                (account.deviceId === device.deviceId) ? 'This browser'
+                  : `First access: ${timeElapsed(device.createDate)} ago`
+              }
+            />
+          </Tooltip>
+          <ListItemSecondaryAction>
+            <Tooltip title="Remove device from account" enterDelay={1000}>
+              <IconButton
+                edge="end"
+                onClick={(): void => {
+                  toast.prompt(`Permanently remove ${device.name}?`, ['Yes', 'No'])
+                  .then((answer) => {
+                    if (answer === 'Yes') {
+                      controller.removeDevice(device.deviceId)
+                      .then((updated) => {
+                        if (updated) {
+                          toast.success('Device removed.');
+                          setDeviceList(deviceList.filter((d) => d.deviceId !== device.deviceId));
+                        }
+                        else {
+                          logger.log(`Could not remove device: ${device.deviceId}`);
+                          toast.error('Failed to remove device.');
+                        }
+                      })
+                      .catch((err) => {
+                        logger.log(`Could not remove device: ${device.deviceId}`, err);
+                        if (err.status === 403) {
+                          toast.error('Not allowed from this browser.');
+                        }
+                        else {
+                          toast.error('Failed to remove device.');
+                        }
+                      });
                     }
                   });
-                }
-              });
-            }}
-            size="large">
-            <DeleteOutlined />
-          </IconButton>
-        </Tooltip>
-      </ListItemSecondaryAction>
-    </ListItem>
-  ));
+                }}
+                size="large">
+                <DeleteOutlined />
+              </IconButton>
+            </Tooltip>
+          </ListItemSecondaryAction>
+        </ListItem>
+      ));
 
   return <>
     <AppBar position="static">
@@ -161,7 +185,7 @@ export const ManageDevicesPage: React.FC<{slide?: SlideDirection}> = ({slide}) =
         <IconButton
           edge="start"
           color="inherit"
-          aria-label="menu"
+          aria-label="back"
           onClick={(): void => navigateTo(<AccountPage slide="back" />)}
           size="large">
           <ArrowBackOutlined />
@@ -179,25 +203,35 @@ export const ManageDevicesPage: React.FC<{slide?: SlideDirection}> = ({slide}) =
           These devices will have additional options enabled.
         </Typography>
         <div>
-          {deviceList.length > 0 ? (
-            <List>
-              <ListItem key="heading">
-                <ListItemIcon>
-                  <Tooltip title="Trusted device">
-                    <VerifiedUserOutlined />
-                  </Tooltip>
-                </ListItemIcon>
-                <ListItemText primary="Device" />
-              </ListItem>
-              <Divider />
-              {deviceListItems}
-            </List>
-          ) : (
-            <CircularProgress />
-          )}
+          {deviceListItems?.length > 0
+            ? (
+              <List>
+                <ListItem key="heading">
+                  <ListItemIcon>
+                    <Tooltip title="Trusted device">
+                      <VerifiedUserOutlined />
+                    </Tooltip>
+                  </ListItemIcon>
+                  <ListItemText primary="Device" />
+                </ListItem>
+                <Divider />
+                {deviceListItems}
+              </List>
+              )
+            : (deviceListItems?.length === 0
+                ? <CircularProgress />
+                : <Alert severity="error">Device list not available at the moment</Alert>)
+          }
         </div>
       </Container>
     </Slide>
     {ToastComponent(toast)}
   </>;
 };
+
+export interface ManageDevicesController {
+  getAccount(): Promise<CacheNutAccount>;
+  loadDeviceList(): Promise<Device[]>;
+  removeDevice(deviceId: string): Promise<boolean>;
+  updateDevice(deviceId: string, isTrusted: boolean): Promise<boolean>;
+}

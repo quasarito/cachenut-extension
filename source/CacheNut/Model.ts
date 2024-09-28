@@ -125,6 +125,9 @@ export const readSettings =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async (keys?: string|string[]): Promise<Record<string, any>> => (await getModelStorage()).get(keys);
 
+/**
+ * @returns the account information in local storage, or a rejected Promise if none found.
+ */
 export const loadAccount = async (): Promise<CacheNutAccount> => {
   const accountItems = await readSettings([ACCOUNT_ID, ACCOUNT_DEVICE_ID, ACCOUNT_TOKEN]);
   if (accountItems.accountId) {

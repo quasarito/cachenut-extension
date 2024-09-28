@@ -291,6 +291,7 @@ export const Options: React.FC<{mock?: OptionsController;}> = ({mock}) => {
       <Typography variant="caption" display="block" gutterBottom>
         Build: { buildVersion }
       </Typography>
+      {Config.loggingEnabled && <Typography variant="caption" display="block" gutterBottom>Logging enabled</Typography>}
     </Stack>
     {ToastComponent(toast)}
   </>;

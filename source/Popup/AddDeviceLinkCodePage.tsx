@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { AppBar, Container, CssBaseline, Slide, TextField, Toolbar, Typography } from '@mui/material';
+import { Alert, AppBar, Container, CssBaseline, Slide, TextField, Toolbar, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { LinkOutlined } from '@mui/icons-material';
 
@@ -52,7 +52,7 @@ async function linkKey(activation: ActivationData): Promise<boolean> {
 
 function createAddDeviceLinkCodeController(): AddDeviceLinkCodeController {
   return {
-    computeLinkCode: async (): Promise<string> => {
+    computePartialLinkCode: async (): Promise<string> => {
       const activation = await loadActivationData();
       if (activation?.firstHash) {
         setTimeout(async () => {
@@ -116,15 +116,20 @@ export const AddDeviceLinkCodePage: React.FC<{slide?: SlideDirection; mock?: Add
   ({mock, slide}) =>
 {
   const linkCode = validatingTextField(true);
+  const [ loadError, setLoadError ] = React.useState('')
   const [ authorizing, setAuthorizing ] = React.useState(false);
   const controller = mock || createAddDeviceLinkCodeController();
   const toast: Toast = {} as Toast;
 
   React.useEffect(() => {
     if (!linkCode.value) {
-      controller.computeLinkCode().then((code) => {
+      controller.computePartialLinkCode()
+      .then((code) => {
         linkCode.setValue(code);
         linkCode.inputRef.current.value = `${formatCode(code)}-`;
+      })
+      .catch((err: Error) => {
+        setLoadError(err.message);
       });
     }
   });
@@ -150,7 +155,7 @@ export const AddDeviceLinkCodePage: React.FC<{slide?: SlideDirection; mock?: Add
             color="primary"
             sx={ CacheNutStyles.submit }
             loading={authorizing}
-            disabled={linkCode.disableInput}
+            disabled={loadError?.length > 0 || linkCode.disableInput}
             onClick={(): void => {
               setAuthorizing(true);
               controller.validateLinkCode(linkCode.value)
@@ -167,6 +172,7 @@ export const AddDeviceLinkCodePage: React.FC<{slide?: SlideDirection; mock?: Add
           >
             Authorize
           </LoadingButton>
+          {!!loadError && <Alert severity="error">{loadError}</Alert>}
         </Container>
       </Slide>
       {ToastComponent(toast)}
@@ -175,7 +181,7 @@ export const AddDeviceLinkCodePage: React.FC<{slide?: SlideDirection; mock?: Add
 };
 
 export interface AddDeviceLinkCodeController {
-  computeLinkCode: () => Promise<string>;
+  computePartialLinkCode: () => Promise<string>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   validateLinkCode: (input: any) => Promise<boolean>;
 }

@@ -156,9 +156,9 @@ export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryControl
     return `Added ${timeElapsed(ts)} ago`;
   };
 
-  const CardUrl: React.FC<{url: string; ts: number | Date; expires?: number | Date;}> =
-  ({url, ts, expires}) => (
-    <Card variant="outlined" sx={CardStyle}>
+  const CardUrl: React.FC<{url: string; ts: number | Date; expires?: number | Date; id?: string}> =
+  ({url, ts, expires, id}) => (
+    <Card id={id} variant="outlined" sx={CardStyle}>
       <CardHeader
         avatar={<Avatar><LinkOutlined /></Avatar>}
         sx={{ '& .MuiCardHeader-content': {overflow: "hidden"} }}
@@ -185,9 +185,9 @@ export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryControl
     </Card>
   );
 
-  const CardImage: React.FC<{url: string; ts: number | Date; expires: number | Date;}> =
-  ({url, ts, expires}) => (
-    <Card variant="outlined" sx={CardStyle}>
+  const CardImage: React.FC<{url: string; ts: number | Date; expires: number | Date; id?: string}> =
+  ({url, ts, expires, id}) => (
+    <Card id={id} variant="outlined" sx={CardStyle}>
       <CardHeader
         avatar={<Avatar><ImageOutlined /></Avatar>}
         sx={{ '& .MuiCardHeader-content': {overflow: "hidden"} }}
@@ -214,15 +214,15 @@ export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryControl
     </Card>
   );
 
-  const CardText: React.FC<{text: string; ts: number | Date; expires?: number | Date;}> =
-  ({text, ts, expires}) => {
+  const CardText: React.FC<{text: string; ts: number | Date; expires?: number | Date; id?: string}> =
+  ({text, ts, expires, id}) => {
     const [expanded, setExpanded] = React.useState(false);
     const handleExpandClick = (): void => {
       setExpanded(!expanded);
     };
 
     return (
-      <Card variant="outlined" sx={CardStyle}>
+      <Card id={id} variant="outlined" sx={CardStyle}>
         <CardHeader
           avatar={<Avatar><TextFieldsOutlined /></Avatar>}
           action={
@@ -315,20 +315,23 @@ export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryControl
   if (isClipsLoaded) {
     if (clipItems.length > 0) {
       gridListItems = clipItems.sort((a, b) => b.createTs - a.createTs) // reverse chronological order
-      .map((item) => {
+      .map((item, idx) => {
         switch (item.content.type) {
           case 'image': {
             const imageItem = item.content as ClipboardUrlContent;
-            return <CardImage key={item.createTs} url={imageItem.url} ts={item.createTs} expires={item.expiresAt} />;
+            return <CardImage id={`history_item_${idx+1}`}
+                    key={item.createTs} url={imageItem.url} ts={item.createTs} expires={item.expiresAt} />;
           }
           case 'url': {
             const urlItem = item.content as ClipboardUrlContent;
-            return <CardUrl key={item.createTs} url={urlItem.url} ts={item.createTs} expires={item.expiresAt} />;
+            return <CardUrl id={`history_item_${idx+1}`}
+                    key={item.createTs} url={urlItem.url} ts={item.createTs} expires={item.expiresAt} />;
           }
           case 'text':
           default: {
             const textItem = item.content as ClipboardTextContent;
-            return <CardText key={item.createTs} text={textItem.text} ts={item.createTs} expires={item.expiresAt} />;
+            return <CardText id={`history_item_${idx+1}`}
+                    key={item.createTs} text={textItem.text} ts={item.createTs} expires={item.expiresAt} />;
           }
         }
       });
@@ -344,7 +347,7 @@ export const HistoryPage: React.FC<{slide?: SlideDirection;mock?: HistoryControl
         <IconButton
           edge="start"
           color="inherit"
-          aria-label="Menu"
+          aria-label="menu"
           onClick={toggleMenuDrawer()}
           size="large">
           <MenuOutlined />

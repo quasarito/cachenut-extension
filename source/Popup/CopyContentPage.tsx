@@ -49,17 +49,21 @@ export const CopyContentPage: React.FC<{slide?: SlideDirection; mock?: CopyConte
   const toast: Toast = {} as Toast;
   const controller = mock || createCopyContentController();
   const [ copying, setCopying ] = React.useState(false);
+  const [ initialPasteDone, setInitialPasteDone ] = React.useState(false);
 
   React.useEffect(() => {
     const contentInput = contentField.current;
-    if (!contentInput?.value) {
+    if (!initialPasteDone && !contentInput?.value) {
       setTimeout(() => {
-        contentInput.select();
-        document.execCommand('paste');
-        if (contentInput.value.length > 0) {
-          toast.info("Clipboard contents found");
+        setInitialPasteDone(true);
+        if (!contentInput?.value) {
+          contentInput.focus();
+          document.execCommand('paste');
+          if (contentInput.value.length > 0) {
+            toast.info("Clipboard contents found");
+          }
         }
-      }, 500);
+      }, 50);
     }
   });
 
@@ -69,7 +73,7 @@ export const CopyContentPage: React.FC<{slide?: SlideDirection; mock?: CopyConte
         <IconButton
           edge="start"
           color="inherit"
-          aria-label="menu"
+          aria-label="back"
           onClick={(): void => navigateTo(<HistoryPage slide="back" />)}
           size="large">
           <ArrowBackOutlined />
@@ -110,7 +114,7 @@ export const CopyContentPage: React.FC<{slide?: SlideDirection; mock?: CopyConte
               .then(copied => {
                 setCopying(false);
                 if (copied) {
-                  toast.success("Copied");
+                  toast.success("Copied.");
                 }
                 else {
                   toast.error("Unable to copy. Try again.");
@@ -118,7 +122,7 @@ export const CopyContentPage: React.FC<{slide?: SlideDirection; mock?: CopyConte
               });
             }
             else {
-              toast.warning("Nothing copied");
+              toast.warning("Nothing copied.");
             }
           }}
         >

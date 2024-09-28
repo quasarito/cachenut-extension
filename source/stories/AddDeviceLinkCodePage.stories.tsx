@@ -14,7 +14,14 @@ export default {
 
 const Template: StoryFn = ({linkCode, delayMillis, validated}) => {
   const mock: AddDeviceLinkCodeController = {
-    computeLinkCode: async () => Promise.resolve(linkCode),
+    computePartialLinkCode: async () => {
+      if (linkCode) {
+        return linkCode;
+      }
+      else {
+        throw new Error('Link error: please cancel and try again.');
+      }
+    },
     validateLinkCode: async (code) => {
       console.log(`validateLinkCode: ${code}`);
       return new Promise(resolve => setTimeout(() => resolve(!!validated), delayMillis || 0));

@@ -72,7 +72,7 @@ export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageCo
         <IconButton
           edge="start"
           color="inherit"
-          aria-label="menu"
+          aria-label="back"
           disabled={disconnecting !== 0}
           onClick={(): void => navigateTo(<HistoryPage slide="back" />)}
           size="large">
@@ -88,7 +88,9 @@ export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageCo
       <Container sx={ CacheNutStyles.paper }>
         {account.id ? (<HowToRegOutlined fontSize="large" />) : (<AccountBoxOutlined fontSize="large" />)}
         Connected:
-        <Typography gutterBottom>{deviceList.length||'#'} {deviceList.length === 1 ? 'device' : 'devices'}</Typography>
+        <Typography id="device_count" gutterBottom>
+          {deviceList.length||'#'} {deviceList.length === 1 ? 'device' : 'devices'}
+        </Typography>
         <Button
           variant="outlined"
           color="primary"
@@ -129,11 +131,11 @@ export const AccountPage: React.FC<{slide?: SlideDirection; mock?: AccountPageCo
           Disconnect from account
         </LoadingButton>
         <Divider>Account id:</Divider>
-        <Typography gutterBottom>
+        <Typography id="account_id" gutterBottom>
           {account.id ? account.id : 'No active account'}
         </Typography>
         <Divider>Device id:</Divider>
-        <Typography gutterBottom>
+        <Typography id="device_id" gutterBottom>
           {account.id ? account.deviceId : 'No active device'}
         </Typography>
       </Container>

@@ -115,3 +115,8 @@ dist/
 # stories/
 
 .vscode/settings.json
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/tests/.auth/

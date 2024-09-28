@@ -18,9 +18,10 @@ import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import UAParser from 'ua-parser-js';
 
-import { resetActivationData } from '../CacheNut/Model';
+import { loadAccount, resetActivationData } from '../CacheNut/Model';
 import { Logger } from '../CacheNut/Support';
 import { HistoryPage } from './HistoryPage';
+import { UnregisteredPage } from './UnregisteredPage';
 
 declare var IS_EXTENSION_BUILD: boolean;
 
@@ -308,13 +309,17 @@ export const CancelActivationButton: React.FC<{message: string; toast: Toast; di
       .then((answer) => {
         logger.log(`CancelActivationButton: ${answer}`);
         if (answer === 'Yes') {
-          resetActivationData();
-          if (IS_EXTENSION_BUILD) {
-            window.close();
-          }
-          else {
-            navigateTo(<HistoryPage />);
-          }
+          resetActivationData()
+          .then(() => {
+            if (IS_EXTENSION_BUILD) {
+              window.close();
+            }
+            else {
+              loadAccount()
+              .then(() => navigateTo(<HistoryPage />))
+              .catch(() => navigateTo(<UnregisteredPage />));
+            }
+          });
         }
       });
     }}

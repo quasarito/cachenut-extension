@@ -101,7 +101,7 @@ export const ConnectAccessCodePage: React.FC<{slide?: SlideDirection;mock?: Conn
         <IconButton
           edge="start"
           color="inherit"
-          aria-label="menu"
+          aria-label="back"
           onClick={(): void => navigateTo(<UnregisteredPage slide="done" />)}
           size="large">
           <ArrowBackOutlined />

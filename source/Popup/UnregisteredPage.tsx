@@ -11,7 +11,7 @@ export const UnregisteredPage: React.FC<{slide?: SlideDirection}> = ({slide}) =>
   return <>
     <AppBar position="static">
       <Toolbar variant="dense">
-        <IconButton edge="start" color="inherit" aria-label="menu" size="large">
+        <IconButton edge="start" color="inherit" aria-label="account" size="large">
           <AccountBox />
         </IconButton>
         <Typography variant="h6" color="inherit" sx={ CacheNutStyles.title }>
